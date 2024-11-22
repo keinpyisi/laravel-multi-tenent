@@ -27,11 +27,18 @@
                             {{-- If it's an array of actions --}}
                             <td class="px-6 py-4">
                                 @foreach ($value as $action)
+                                    @php
+                                        $target =
+                                            isset($action['target']) && $action['target'] === 'new'
+                                                ? 'target="_blank"'
+                                                : '';
+                                    @endphp
                                     @if (is_array($action) && isset($action['label'], $action['class']))
                                         @if (isset($action['type']) && $action['type'] === 'button')
-                                            @if (isset($action['url']))
+                                            @if (isset($action['url']) && isset($action['method']))
                                                 {{-- Button Action --}}
-                                                <form action="{{ $action['url'] }}" method="POST" class="inline">
+                                                <form action="{{ $action['url'] }}" method="{{ $action['method'] }}"
+                                                    class="inline" {{ $target }}>
                                                     @csrf
                                                     <x-admin::button :action="$action">
                                                         {{ $action['label'] }}
@@ -44,7 +51,8 @@
                                             @endif
                                         @else
                                             <a href="{{ $action['url'] }}" id="{{ $action['id'] }}"
-                                                class="{{ $action['class'] }}">{{ $action['label'] }}</a>
+                                                class="{{ $action['class'] }}"
+                                                {{ $target }}>{{ $action['label'] }}</a>
                                         @endif
                                         @if (!$loop->last)
                                             |
