@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Artisan;
 
 class one_CreateBaseTenantSchema extends Command
 {
+    //php artisan tenant:create-base-schema --seed
     protected $signature = 'tenant:create-base-schema {--fresh} {--seed}';
     protected $description = 'Create base tenant schema and run migrations';
 

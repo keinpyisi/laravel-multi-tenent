@@ -9,25 +9,23 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Artisan;
 
-class three_CreateTenant extends Command
-{
+class three_CreateTenant extends Command {
     protected $signature = 'tenant:create {name}';
     protected $description = 'Create a new tenant';
-    
+
     //php artisan tenants:link
-    public function handle()
-    {
-       // Get and display the current database configuration
+    public function handle() {
+        // Get and display the current database configuration
         $dbConfig = config('database.connections.' . config('database.default'));
         $this->info("Current Database Configuration:");
         $this->table(['Key', 'Value'], collect($dbConfig)->map(function ($value, $key) {
             return [$key, is_array($value) ? json_encode($value) : $value];
         })->toArray());
-        
+
         $name = $this->argument('name');
         $domain = Str::slug($name);
         $schema = $domain;
-        
+
         DB::statement("SET search_path TO base_tenants");
         // Get all tables in the base_tenants schema
         $tables = DB::select("SELECT table_name FROM information_schema.tables WHERE table_schema = 'base_tenants'");
@@ -38,7 +36,7 @@ class three_CreateTenant extends Command
 
         $this->table(['Table Name'], $tableData);
         // Check if the tenants table exists in the base_tenants schema
-            $tenantTableExists = DB::select("
+        $tenantTableExists = DB::select("
             SELECT EXISTS (
                 SELECT FROM information_schema.tables 
                 WHERE table_schema = 'base_tenants' 
@@ -52,9 +50,12 @@ class three_CreateTenant extends Command
         }
 
         $tenant = Tenant::create([
-            'name' => $name,
+            'client_name' => $name,
+            'account_name' => $name, // You might want to adjust this
             'domain' => $domain,
             'database' => $schema, // We're using 'database' to store the schema name
+            'tenent_unique_key' => Str::uuid()->toString(),
+            'del_flag' => false,
         ]);
 
         $this->info("Tenant created successfully.");
@@ -75,8 +76,7 @@ class three_CreateTenant extends Command
         $this->info("Tenant setup completed.");
     }
 
-    private function createSchema($name)
-    {
+    private function createSchema($name) {
         $query = "SELECT schema_name FROM information_schema.schemata WHERE schema_name = ?";
         $schema = DB::select($query, [$name]);
 
@@ -88,8 +88,7 @@ class three_CreateTenant extends Command
         }
     }
 
-    private function runTenantMigrations($schema)
-    {
+    private function runTenantMigrations($schema) {
         $this->info("Running migrations for tenant schema: {$schema}");
 
         // Set the search path to the tenant's schema
@@ -107,8 +106,7 @@ class three_CreateTenant extends Command
         $this->info("Tenant migrations completed.");
     }
 
-    private function createCustomFolder($domain)
-    {
+    private function createCustomFolder($domain) {
         $customFolder = tenant_path($domain);
         if (!file_exists($customFolder)) {
             mkdir($customFolder, 0755, true);
