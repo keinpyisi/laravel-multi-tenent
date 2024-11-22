@@ -32,9 +32,20 @@ class TenantController extends Controller {
     }
 
     public function create() {
+        $header_js_defines = [
+            'resources/js/clients/create.js',
+        ];
+        $header_css_defines = [
+            //'resources/css/clients/index.css',
+        ];
+        // Share the variable globally
+        view()->share('header_js_defines', $header_js_defines);
+        view()->share('header_css_defines', $header_css_defines);
+        return view('admin.pages.tenants.create');
     }
 
     public function store(Request $request) {
+        dd($request);
         // $validator = Validator::make($request->all(), [
         //     "name" => ["required"],
         // ]);

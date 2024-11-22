@@ -11,6 +11,7 @@ import 'sweetalert2/src/sweetalert2.scss'
 window.Swal = Swal; // Make Swal available globally
 
 
+
 // Import Chart.js
 import { Chart } from 'chart.js';
 
@@ -18,6 +19,9 @@ import { Chart } from 'chart.js';
 import flatpickr from 'flatpickr';
 
 // import component from './components/component';
+//For Dark and Light Mode
+import dashboardCard04 from './components/dashboard-card-04';
+
 // Define Chart.js default settings
 /* eslint-disable prefer-destructuring */
 Chart.defaults.font.family = '"Inter", sans-serif';
