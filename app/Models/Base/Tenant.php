@@ -4,11 +4,15 @@ namespace App\Models\Base;
 
 use App\Models\Tenant\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Tenant extends Model {
     protected $connection = 'pgsql';
     protected $table = 'base_tenants.tenants';
+
+    const DELETED = 1;
+    const ACTIVE = 0;
     protected $fillable = [
         'client_name',
         'account_name',
@@ -41,6 +45,10 @@ class Tenant extends Model {
     public $timestamps = true;
     public function tenent_users(): BelongsTo {
         return $this->belongsTo(User::class);
+    }
+
+    public function scopeActiveWith(Builder $query): Builder {
+        return $query->where('del_flag', $this::ACTIVE);
     }
     // If you're using UUID, uncomment the following line
     // use Illuminate\Database\Eloquent\Concerns\HasUuids;

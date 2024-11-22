@@ -11,7 +11,7 @@
         <!-- ====== Table Section Start -->
         <div class="flex flex-col gap-10">
             @php
-            $headers = ["Product name", "Color", "Category", "Price", "Action"];
+            $headers = ["ID", "Client Name", "Note", "Action"];
             $rows = [
             ["Apple MacBook Pro 17\"", "Silver", "Laptop", "$2999", "#"],
             ["Microsoft Surface Pro", "White", "Laptop PC", "$1999", "#"],
