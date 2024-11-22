@@ -11,12 +11,39 @@
         <!-- ====== Table Section Start -->
         <div class="flex flex-col gap-10">
             @php
-            $headers = ["ID", "Client Name", "Note", "Action"];
-            $rows = [
-            ["Apple MacBook Pro 17\"", "Silver", "Laptop", "$2999", "#"],
-            ["Microsoft Surface Pro", "White", "Laptop PC", "$1999", "#"],
-            ["Magic Mouse 2", "Black", "Accessories", "$99", "#"]
-            ];
+                $headers = ['ID', 'クライアントの名前', '備考', '操作'];
+                foreach ($tenents as $tenent) {
+                    $rows[] = [
+                        $tenent->id,
+                        $tenent->client_name,
+                        $tenent->note,
+                        [
+                            [
+                                'label' => 'リンク',
+                                'class' =>
+                                    'transition duration-150 ease-in-out px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
+                                'type' => 'button',
+                                'id' => 'link_btn',
+                                'url' => '/client/1/edit',
+                            ],
+                            [
+                                'label' => '詳細',
+                                'class' =>
+                                    'transition duration-150 ease-in-out px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500',
+                                'id' => 'detail_btn',
+                                'url' => '/client/1/view',
+                            ],
+                            [
+                                'label' => '削除',
+                                'class' =>
+                                    'focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900',
+                                'id' => 'delete_btn',
+                                'type' => 'button',
+                            ],
+                        ],
+                        // or any action-related button/link
+                    ];
+                }
             @endphp
             <x-admin::tables :headers="$headers" :rows="$rows" />
 

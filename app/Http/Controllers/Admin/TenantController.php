@@ -17,6 +17,16 @@ class TenantController extends Controller {
     }
 
     public function index() {
+        $header_js_defines = [
+            'resources/js/clients/index.js',
+        ];
+        $header_css_defines = [
+            //'resources/css/clients/index.css',
+        ];
+        // Share the variable globally
+        view()->share('header_js_defines', $header_js_defines);
+        view()->share('header_css_defines', $header_css_defines);
+
         $tenents = Tenant::activeWith()->paginate(100);
         return view('admin.pages.tenants.list', compact('tenents'));
     }
