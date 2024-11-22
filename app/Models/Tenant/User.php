@@ -14,6 +14,10 @@ class User extends Authenticatable {
         'name',
         'email',
         'password',
+        'login_id',
+        'tenant_id',
+        'mst_user_auth_id',
+        'user_name'
     ];
 
     protected $hidden = [
