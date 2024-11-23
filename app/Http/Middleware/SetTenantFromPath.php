@@ -29,7 +29,6 @@ class SetTenantFromPath {
                     config(['database.connections.tenant.search_path' => $tenant->database]);
                     DB::purge('tenant');
                     DB::reconnect('tenant');
-                    
                 } else {
                     abort(404);
                 }
