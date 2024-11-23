@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Admin;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Contracts\Validation\Validator;

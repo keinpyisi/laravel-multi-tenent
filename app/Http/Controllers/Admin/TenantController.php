@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\Client_Validation;
+use App\Http\Requests\Admin\Client_Validation;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\ValidationException;
+use App\Http\Requests\Admin\Client_Edit_Validation;
 use \App\Models\Tenant\Tenant as Client_Tenant;
 
 class TenantController extends Controller {
@@ -201,16 +201,86 @@ class TenantController extends Controller {
     public function edit(int $id) {
     }
 
-    public function update(Request $request, int $id) {
-        // $validator = Validator::make($request->all(), [
-        //     "name" => ["required"],
-        // ]);
+    public function update(Client_Edit_Validation $request, int $id) {
+        DB::beginTransaction();
+        try {
+            // Find the tenant or fail if not found
+            $tenant = Tenant::findOrFail($id);
+            $client_name = $tenant->client_name;
+            // Validate the request
+            $validatedData = $request->validated();
+            if ($request->hasFile('logo')) {
+                try {
+                    $logo = $request->file('logo');
 
-        // if ($validator->fails()) {
+                    // Get the original extension
+                    $extension = $logo->getClientOriginalExtension(); // "png", "jpg", etc.
 
-        // }
+                    // Set the logo name
+                    $logoName = 'logo.' . $extension;
 
+                    // Define the directory structure (corrected path)
+                    $tenantLogoPath = $tenant->domain . '/logo';  // No need to include 'tenants/'
+
+                    // Ensure the directory exists
+                    $logoDirectory = storage_path('app/tenants/' . $tenantLogoPath);  // Ensure the full path includes 'tenants/'
+                    if (!is_dir($logoDirectory)) {
+                        mkdir($logoDirectory, 0775, true);  // Create directory if it doesn't exist
+                    }
+
+                    // Store the file in the specified location
+                    $logoPath = $logo->storeAs($tenantLogoPath, $logoName, 'tenant');
+
+                    // Check if the file exists
+                    if (Storage::disk('tenant')->exists($logoPath)) {
+                        // Get the full path
+                        $fullPath = Storage::disk('tenant')->path($logoPath);
+                        Log::error(['message' => 'File uploaded and exists', 'full_path' => $fullPath]);
+                    } else {
+                        Log::error('Error uploading logo: No File');
+                    }
+
+                    // Save the file path to the database or log it
+                    $validatedData['logo'] = $logoPath;
+                } catch (Exception $e) {
+                    Log::error('Error uploading logo: ' . $e->getMessage());
+                    return back()->withErrors(['error' => ['title' => 'An error occurred while uploading the logo.']]);
+                }
+            } else {
+                Log::error('Logo file upload failed for tenant: ' . $client_name);
+            }
+            // Update the tenant with the validated data
+            $tenant->update($validatedData);
+            DB::statement("SET search_path TO {$tenant->database}");
+            $client_tenant = Client_Tenant::findOrFail($id);
+            $client_tenant->update($validatedData);
+            DB::statement("SET search_path TO base_tenants");
+            DB::commit();
+
+            // Optionally, you can return a response or redirect
+            return redirect()->route('admin.tenants.index')->with(
+                'success',
+                [
+                    'title' => __('lang.success_title'),
+                    'text' => __('lang.success', ['attribute' => $client_name]),
+                ]
+            );
+        } catch (Exception $ex) {
+            Log::error($ex);
+            Log::error('Error occurred during tenant creation: ', ['exception' => $ex->getMessage()]);
+
+            DB::rollBack();
+
+            return redirect()->route('admin.tenants.index')->with('error', [
+                'title' => __('lang.error_title'),
+                'text' => __('lang.error', ['attribute' => $ex->getMessage()]),
+            ]);
+        } finally {
+            // Always reset search path back to base_tenants in case of failure
+            DB::statement("SET search_path TO base_tenants");
+        }
     }
+
 
     public function destroy($id) {
         try {

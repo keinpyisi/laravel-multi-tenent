@@ -59,9 +59,9 @@
                                 <div class="flex flex-col">
                                     <x-admin::labels label="アカウント名*"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
-                                    <x-admin::labels label="{{ $tenant->account_name }}"
-                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
 
+                                    <x-admin::input-field type="hidden" name="account_name" id="account_name"
+                                        label="{{ $tenant->account_name }}" value="{{ $tenant->account_name }}" />
                                 </div>
                                 <div class="flex flex-col">
                                     <x-admin::input-field type="text" label="クライアント名*" name="client_name"
@@ -90,6 +90,13 @@
                                 <div class="flex flex-col">
                                     <x-admin::input-field type="file" label="ロゴ*" name="logo" id="logo"
                                         class="mt-1 block w-full" />
+                                    @php
+                                        $logoPath = $tenant->logo; // e.g., 'tenants/ecos/logo/logo-dark.png'
+                                        $domain = explode('/', $logoPath)[0]; // ecos
+                                        $file = basename($logoPath); // logo-dark.png
+                                    @endphp
+                                    <img src="{{ route('tenant.logo', ['domain' => $domain, 'file' => $file]) }}"
+                                        alt='Logo' class='h-25 w-35 object-cover'>
                                     @error('logo')
                                         <div class="text-sm text-red-600">{{ $message }}</div>
                                     @enderror
@@ -130,7 +137,7 @@
                                     <x-admin::input-field label="ホームページ" name="url" type="url"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                         value="{{ $tenant->url }}" placeholder="https://www.google.com/" />
-                                    @error('tel')
+                                    @error('url')
                                         <div class="text-sm text-red-600">{{ $message }}</div>
                                     @enderror
                                 </div>
@@ -138,7 +145,7 @@
                                     <x-admin::input-field label="郵便番号" name="post_code" type="text"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                         value="{{ $tenant->post_code }}" placeholder="134-0084" />
-                                    @error('tel')
+                                    @error('post_code')
                                         <div class="text-sm text-red-600">{{ $message }}</div>
                                     @enderror
                                 </div>
