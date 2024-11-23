@@ -37,9 +37,13 @@
                                         @if (isset($action['type']) && $action['type'] === 'button')
                                             @if (isset($action['url']) && isset($action['method']))
                                                 {{-- Button Action --}}
-                                                <form action="{{ $action['url'] }}" method="{{ $action['method'] }}"
+                                                <form action="{{ $action['url'] }}"
+                                                    method="{{ in_array($action['method'], ['DELETE', 'PUT']) ? 'POST' : $action['method'] }}"
                                                     class="inline" {{ $target }}>
                                                     @csrf
+                                                    @if (in_array($action['method'], ['DELETE', 'PUT']))
+                                                        @method($action['method'])
+                                                    @endif
                                                     <x-admin::button :action="$action">
                                                         {{ $action['label'] }}
                                                     </x-admin::button>

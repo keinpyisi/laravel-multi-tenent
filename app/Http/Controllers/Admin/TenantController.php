@@ -5,14 +5,15 @@ namespace App\Http\Controllers\Admin;
 
 use Exception;
 use App\Models\Base\Tenant;
+use App\Models\Tenant\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Client_Validation;
-use App\Models\Tenant\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -30,13 +31,18 @@ class TenantController extends Controller {
         $header_css_defines = [
             //'resources/css/clients/index.css',
         ];
+
         // Share the variable globally
         view()->share('header_js_defines', $header_js_defines);
         view()->share('header_css_defines', $header_css_defines);
 
-        $tenents = Tenant::activeWith()->paginate(100);
+        // Fetch active tenants and paginate
+        $tenents = Tenant::activeWith()->paginate(4);
+
+        // Return the view with the paginated tenants
         return view('admin.pages.tenants.list', compact('tenents'));
     }
+
 
     public function create() {
         $header_js_defines = [
@@ -160,8 +166,58 @@ class TenantController extends Controller {
 
     }
 
-    public function destroy(int $id) {
+    public function destroy($id) {
+        try {
+            DB::beginTransaction();
+
+            // Find the tenant by ID
+            $tenant = Tenant::findOrFail($id);
+
+            // Get the tenant's domain to remove associated files
+            $tenantDomain = $tenant->domain;
+            $tenantLogoPath = 'tenants/' . $tenantDomain . '/logo';
+
+            // Delete the tenant's logo file if it exists
+            if (Storage::exists($tenantLogoPath)) {
+                Storage::delete($tenantLogoPath);
+            }
+
+            // Drop tenant-specific schema and database
+            $this->dropSchema($tenant->database); // Make sure this method exists to handle schema drop
+            // Delete the tenant record itself
+            $tenant->delete();
+
+            // Commit the transaction
+            DB::commit();
+
+            // Redirect with success message
+            return redirect()->route('admin.tenants.index')->with('success', [
+                'title' => __('lang.success_title'),
+                'text' => __('lang.tenant_deleted', ['tenant' => $tenant->client_name]), // Ensure this lang exists
+            ]);
+        } catch (Exception $ex) {
+            // Log errors
+            Log::error('Error occurred during tenant deletion: ', ['exception' => $ex->getMessage()]);
+
+            // Rollback transaction in case of error
+            DB::rollBack();
+
+            // Redirect with error message
+            return redirect()->route('admin.tenants.index')->with('error', [
+                'title' => __('lang.error_title'),
+                'text' => __('lang.error', ['attribute' => $ex->getMessage()]),
+            ]);
+        }
     }
+    protected function dropSchema($database) {
+        try {
+            DB::statement("DROP SCHEMA IF EXISTS {$database} CASCADE");
+        } catch (Exception $ex) {
+            Log::error('Error while dropping schema for tenant: ' . $database, ['exception' => $ex->getMessage()]);
+        }
+    }
+
+
     private function createSchema($name) {
         DB::statement("CREATE SCHEMA \"$name\"");
     }

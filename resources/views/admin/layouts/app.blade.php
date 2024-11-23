@@ -18,6 +18,7 @@
             success: @json(session('success')),
             error: @json(session('error'))
         };
+        window.Lang = @json(__('lang')); // Assuming 'lang' is your language file
     </script>
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])

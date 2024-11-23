@@ -31,28 +31,34 @@
                             [
                                 'label' => 'リンク',
                                 'class' =>
-                                    'transition duration-150 ease-in-out px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
+                                    'link_btn transition duration-150 ease-in-out px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
                                 'type' => 'button',
                                 'id' => 'link_btn',
                                 'url' => route('tenant.client.index', ['tenant' => $tenent->domain]), // Dynamically generating the route
                                 'method' => 'GET',
+                                'which_type' => 'submit',
                                 'target' => 'new', // This will open in a new window/tab
                             ],
                             [
                                 'label' => '詳細',
                                 'class' =>
-                                    'transition duration-150 ease-in-out px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500',
+                                    'detail_btn transition duration-150 ease-in-out px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500',
                                 'id' => 'detail_btn',
                                 'url' => route('admin.tenants.show', [$tenent]), // Dynamically setting the detail URL
                                 'type' => 'button',
+                                'which_type' => 'submit',
+                                'data-id' => $tenent->id,
                             ],
                             [
                                 'label' => '削除',
                                 'class' =>
-                                    'transition duration-150 ease-in-out px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500',
+                                    'delete_btn transition duration-150 ease-in-out px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500',
                                 'id' => 'delete_btn',
-                                'method' => 'GET',
+                                'url' => route('admin.tenants.destroy', [$tenent->id]),
+                                'method' => 'DELETE',
                                 'type' => 'button',
+                                'which_type' => 'button',
+                                'data-id' => $tenent->id,
                             ],
                         ],
                     ];
@@ -60,7 +66,10 @@
 
             @endphp
             <x-admin::tables :headers="$headers" :rows="$rows" />
-
+            <!-- Pagination Section -->
+            <div class="mt-6">
+                <x-admin::paginations :paginator="$tenents" /> <!-- Pagination links -->
+            </div>
         </div>
         <!-- ====== Table Section End -->
     </div>
