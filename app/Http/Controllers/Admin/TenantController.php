@@ -11,12 +11,13 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Requests\Admin\Client_Validation;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Requests\Admin\Client_Edit_Validation;
+use App\Http\Requests\Admin\Client_Validation;
 use \App\Models\Tenant\Tenant as Client_Tenant;
+use App\Http\Requests\Admin\Client_Edit_Validation;
 
 class TenantController extends Controller {
     private Request $request;
@@ -194,7 +195,63 @@ class TenantController extends Controller {
         DB::statement("SET search_path TO {$tenant->database}");
         $users = User::where('tenant_id', $tenant->id)->paginate(100);
         DB::statement("SET search_path TO base_tenants");
-        return view('admin.pages.tenants.show', compact('tenant', 'users'));
+        // Specify the directory to calculate (e.g., storage directory)
+        $directory = storage_path();  // You can change this to any directory you want to analyze
+
+        // Get the total disk size, free space, and used space
+        $totalSize = disk_total_space($directory);  // in bytes
+        $freeSpace = disk_free_space($directory);   // in bytes
+        $usedSpace = $totalSize - $freeSpace;       // Calculate used space
+
+        // Convert bytes to gigabytes
+        $totalSizeGB = $totalSize / 1073741824;  // Divide by 1024^3
+        $freeSpaceGB = $freeSpace / 1073741824;
+        $usedSpaceGB = $usedSpace / 1073741824;
+
+        // Calculate usage rate
+        $usageRate = ($usedSpace / $totalSize) * 100;  // Calculate usage rate in percentage
+
+        // Format the values for display
+        $totalSizeFormatted = number_format($totalSizeGB, 2) . ' GB';
+        $freeSpaceFormatted = number_format($freeSpaceGB, 2) . ' GB';
+        $usedSpaceFormatted = number_format($usedSpaceGB, 2) . ' GB';
+        $usageRateFormatted = number_format($usageRate, 2) . '%';
+        $all_usage = [
+            'total_size' => $totalSizeFormatted,
+            'free_space' => $freeSpaceFormatted,
+            'used_space' => $usedSpaceFormatted,
+            'usage_rate' => $usageRateFormatted
+        ];
+
+        $logoFolder = tenant_path($tenant->domain, 'files'); // Path to the folder containing the files
+
+        // Retrieve all the files in the folder
+        $files = File::allFiles($logoFolder);
+
+        // Initialize variables to store total size for main files and thumbnails
+        $totalSize = 0;
+        $mainSize = 0;
+        $thumbnailSize = 0;
+
+        // Iterate through the files and calculate their sizes
+        foreach ($files as $file) {
+            $totalSize += $file->getSize();  // Total size of all files in bytes
+            // Assuming that you can differentiate between main and thumbnail files
+            // For example, if the file name contains 'thumb' or something similar:
+            // if (str_contains($file->getFilename(), 'thumb')) {
+            //     $thumbnailSize += $file->getSize();
+            // } else {
+            //     $mainSize += $file->getSize();
+            // }
+        }
+
+        // Convert the sizes from bytes to MB and KB
+        $totalSizeMB = number_format($totalSize / 1024 / 1024, 2) . ' MB'; // MB
+        $client_usage = [
+            'total_size' => $totalSizeMB,
+        ];
+
+        return view('admin.pages.tenants.show', compact('tenant', 'users', 'all_usage', 'client_usage'));
     }
 
 

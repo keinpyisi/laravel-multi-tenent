@@ -33,7 +33,7 @@
                         'text-gray-500 dark:text-gray-400': activeTab !== 1
                     }"
                     @click="activeTab = 1" class="py-2 px-4 text-sm font-medium focus:outline-none">
-                    Tab 2
+                    使用状況
                 </button>
                 <button
                     :class="{
@@ -180,8 +180,28 @@
                 </div>
                 <div x-show="activeTab === 1">
                     <!-- Content for Tab 2 -->
-                    <h3 class="text-lg font-semibold text-black dark:text-white">Tab 2 Content</h3>
-                    <p>Content for the second tab goes here.</p>
+                    <!-- Section for Overview -->
+                    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <!-- Overview Block 1 -->
+                            <div
+                                class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mb-6 p-4 rounded-lg shadow-md">
+                                <h3 class="text-lg font-semibold">全体</h3>
+                                <p class="text-gray-500 mt-2">全体サイズ: {{ $all_usage['total_size'] }}</p>
+                                <p class="text-gray-500">空き容量: {{ $all_usage['free_space'] }}</p>
+                                <p class="text-gray-500">使用容量: {{ $all_usage['used_space'] }}</p>
+                                <p class="text-gray-500">使用率: {{ $all_usage['usage_rate'] }}</p>
+                            </div>
+
+                            <!-- Overview Block 2 -->
+                            <div
+                                class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mb-6 p-4 rounded-lg shadow-md">
+                                <h3 class="text-lg font-semibold">企画添付ファイル</h3>
+                                <p class="text-gray-500 mt-2">使用容量: {{ $client_usage['total_size'] }}</p>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <div x-show="activeTab === 2">
                     <!-- Content for Tab 3 -->
