@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Tenant extends Model {
-    
+
     const DELETED = 1;
     const ACTIVE = 0;
     protected $fillable = [
+        'id',
         'client_name',
         'account_name',
         'domain',

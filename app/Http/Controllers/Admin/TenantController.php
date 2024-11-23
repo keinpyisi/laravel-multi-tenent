@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Client_Validation;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use \App\Models\Tenant\Tenant as Client_Tenant;
 
 class TenantController extends Controller {
     private Request $request;
@@ -37,7 +38,7 @@ class TenantController extends Controller {
         view()->share('header_css_defines', $header_css_defines);
 
         // Fetch active tenants and paginate
-        $tenents = Tenant::activeWith()->paginate(4);
+        $tenents = Tenant::activeWith()->paginate(20);
 
         // Return the view with the paginated tenants
         return view('admin.pages.tenants.list', compact('tenents'));
@@ -74,16 +75,46 @@ class TenantController extends Controller {
             $this->createCustomFolder($data['domain']);
 
             if ($request->hasFile('logo')) {
-                $logo = $request->file('logo');
-                $logoName = $logo->getClientOriginalName();
-                $tenantLogoPath = 'tenants/' . $data['domain'] . '/logo';
+                try {
+                    $logo = $request->file('logo');
 
-                // Store the logo file using Storage::putFileAs
-                $logoPath = $logo->storeAs($tenantLogoPath, $logoName, 'local');
-                $data['logo'] = $logoPath;
+                    // Get the original extension
+                    $extension = $logo->getClientOriginalExtension(); // "png", "jpg", etc.
+
+                    // Set the logo name
+                    $logoName = 'logo.' . $extension;
+
+                    // Define the directory structure (corrected path)
+                    $tenantLogoPath = $data['domain'] . '/logo';  // No need to include 'tenants/'
+
+                    // Ensure the directory exists
+                    $logoDirectory = storage_path('app/tenants/' . $tenantLogoPath);  // Ensure the full path includes 'tenants/'
+                    if (!is_dir($logoDirectory)) {
+                        mkdir($logoDirectory, 0775, true);  // Create directory if it doesn't exist
+                    }
+
+                    // Store the file in the specified location
+                    $logoPath = $logo->storeAs($tenantLogoPath, $logoName, 'tenant');
+
+                    // Check if the file exists
+                    if (Storage::disk('tenant')->exists($logoPath)) {
+                        // Get the full path
+                        $fullPath = Storage::disk('tenant')->path($logoPath);
+                        Log::error(['message' => 'File uploaded and exists', 'full_path' => $fullPath]);
+                    } else {
+                        Log::error('Error uploading logo: No File');
+                    }
+
+                    // Save the file path to the database or log it
+                    $data['logo'] = $logoPath;
+                } catch (Exception $e) {
+                    Log::error('Error uploading logo: ' . $e->getMessage());
+                    return back()->withErrors(['error' => ['title' => 'An error occurred while uploading the logo.']]);
+                }
             } else {
                 Log::error('Logo file upload failed for tenant: ' . $data['domain']);
             }
+
 
             // Add tenant unique key
             $data['tenent_unique_key'] = Str::uuid()->toString();  // Ensure spelling matches the database column
@@ -103,7 +134,8 @@ class TenantController extends Controller {
             DB::beginTransaction();
 
             DB::statement("SET search_path TO {$data['database']}");
-            $tenant = \App\Models\Tenant\Tenant::create($data);
+            $data['id'] = $tenant->id;
+            $tenant = Client_Tenant::create($data);
 
             User::create([
                 'login_id' => $data['login_id'],
@@ -142,15 +174,29 @@ class TenantController extends Controller {
 
 
     public function show(int $id) {
-        // $r = [
-        //     "id" => $id,
-        // ];
+        DB::statement("SET search_path TO base_tenants");
 
-        // $validator = Validator::make($r, [
-        //     "id" => ["required", "exists:sns,id"],
-        // ]);
+        $r = [
+            "id" => $id,
+        ];
 
+        $validator = Validator::make($r, [
+            "id" => ["required", "exists:tenants,id"],
+        ]);
+
+        // Check if validation fails
+        if ($validator->fails()) {
+            // Return 404 if validation fails
+            abort(404);
+        }
+
+        $tenant = Tenant::findOrFail($id);
+        DB::statement("SET search_path TO {$tenant->database}");
+        $users = User::where('tenant_id', $tenant->id)->paginate(100);
+        DB::statement("SET search_path TO base_tenants");
+        return view('admin.pages.tenants.show', compact('tenant', 'users'));
     }
+
 
     public function edit(int $id) {
     }

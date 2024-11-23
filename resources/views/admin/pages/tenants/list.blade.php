@@ -20,12 +20,19 @@
         <!-- ====== Table Section Start -->
         <div class="flex flex-col gap-10">
             @php
-                $headers = ['ID', 'クライアントの名前', '備考', '操作'];
+                $headers = ['ID', 'クライアントの名前', 'ロゴ', '備考', '操作'];
                 $rows[] = [];
                 foreach ($tenents as $tenent) {
+                    // Extracting domain and filename from the tenant logo path
+                    $logoPath = $tenent->logo; // e.g., 'tenants/ecos/logo/logo-dark.png'
+                    $domain = explode('/', $logoPath)[0]; // ecos
+                    $file = basename($logoPath); // logo-dark.png
                     $rows[] = [
                         $tenent->id,
                         $tenent->client_name,
+                        "<img src='" .
+                        route('tenant.logo', ['domain' => $domain, 'file' => $file]) .
+                        "' alt='Logo' class='h-25 w-35 object-cover'>",
                         $tenent->note,
                         [
                             [
@@ -45,7 +52,7 @@
                                     'detail_btn transition duration-150 ease-in-out px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500',
                                 'id' => 'detail_btn',
                                 'url' => route('admin.tenants.show', [$tenent]), // Dynamically setting the detail URL
-                                'type' => 'button',
+                                'type' => 'submit',
                                 'which_type' => 'submit',
                                 'data-id' => $tenent->id,
                             ],

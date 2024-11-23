@@ -63,9 +63,9 @@
                             </div>
 
                             <div class="mb-4">
-                                <x-admin::input-field label="お問い合わせメールアドレス" name="e_mail" type="email"
+                                <x-admin::input-field label="お問い合わせメールアドレス" name="support_mail" type="support_mail"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                    value="{{ old('e_mail') }}" placeholder="例:support@ascon.co.jp" />
+                                    value="{{ old('support_mail') }}" placeholder="例:support@ascon.co.jp" />
                                 @error('e_mail')
                                     <div class="text-sm text-red-600">{{ $message }}</div>
                                 @enderror

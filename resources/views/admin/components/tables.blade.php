@@ -63,13 +63,13 @@
                                         @endif
                                     @else
                                         {{-- Handle the case where action is a simple string (fallback) --}}
-                                        {{ dd($action) }}
+                                        {{-- {{ dd($action) }} --}}
                                     @endif
                                 @endforeach
                             </td>
                         @else
                             <td class="px-6 py-4">
-                                {{ $value }}
+                                {!! $value !!}
                             </td>
                         @endif
                     @endforeach
