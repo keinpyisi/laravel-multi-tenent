@@ -76,6 +76,13 @@
                                             class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">クライアント一覧</span>
                                     </a>
                                 </li>
+                                <li class="mb-1 last:mb-0">
+                                    <a class="block text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition truncate @if (Route::is('admin.tenants.create')) {{ '!text-violet-500' }} @endif"
+                                        href="{{ route('admin.tenants.create') }}">
+                                        <span
+                                            class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">クライアント作成</span>
+                                    </a>
+                                </li>
                             </ul>
                         </div>
                     </li>
