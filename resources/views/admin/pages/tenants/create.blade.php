@@ -17,21 +17,30 @@
 
                             <div class="mb-4">
                                 <x-admin::input-field type="text" label="クライアント名*" name="client_name"
-                                    id="client_name" placeholder="例:アスコン商店"
+                                    id="client_name" placeholder="例:アスコン商店" value="{{ old('client_name') }}"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                                @error('client_name')
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="mb-4">
-                                <x-admin::input-field type="text" label="フリガナ*" name="furigana" id="furigana"
-                                    placeholder="例:アスコンショウテン"
+                                <x-admin::input-field type="text" label="フリガナ*" name="kana" id="kana"
+                                    placeholder="例:アスコンショウテン" value="{{ old('kana') }}"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                                @error('kana')
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="mb-4">
                                 <x-admin::input-field type="text" label="アカウント名*" name="account_name"
-                                    id="account_name" placeholder="例:ascon_shouten"
+                                    id="account_name" placeholder="例:ascon_shouten" value="{{ old('account_name') }}"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
                                 <p class="mt-1 text-sm text-gray-500">半角英小文字と数字、_のみ。URLのディレクトリ名</p>
+                                @error('account_name')
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="mb-4">
@@ -41,14 +50,21 @@
 
                             <div class="mb-4">
                                 <x-admin::input-field type="url" label="ホームページ" name="homepage" id="homepage"
-                                    placeholder="例:https://www.ascon.co.jp"
+                                    placeholder="例:https://www.ascon.co.jp" value="{{ old('homepage') }}"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
                                 <p class="mt-1 text-sm text-gray-500">フロントサイトから遷移するホームページ</p>
+                                @error('url')
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="mb-4">
-                                <x-admin::input-field label="お問い合わせメールアドレス" name="email" type="email"
-                                    placeholder="例:support@ascon.co.jp" />
+                                <x-admin::input-field label="お問い合わせメールアドレス" name="e_mail" type="email"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                                    value="{{ old('e_mail') }}" placeholder="例:support@ascon.co.jp" />
+                                @error('e_mail')
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
 
@@ -58,24 +74,38 @@
 
                             <div class="mb-4">
                                 <x-admin::input-field label="ログインID*" type="text" name="login_id" id="login_id"
-                                    placeholder="半角英数字のみ"
+                                    placeholder="半角英数字のみ" value="{{ old('login_id') }}"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                                @error('login_id')
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="mb-4">
-                                <x-admin::input-field label="ユーザー名*" type="text" name="username" id="username"
+                                <x-admin::input-field label="ユーザー名*" type="text" name="user_name" id="user_name"
+                                    value="{{ old('user_name') }}"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                                @error('user_name')
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="mb-4">
                                 <x-admin::input-field label="パスワード*" type="password" name="password" id="password"
+                                    value="{{ old('password') }}"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                                @error('password')
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="mb-4">
                                 <x-admin::input-field label="パスワードを再度入力*" type="password" name="password_confirmation"
-                                    id="password_confirmation"
+                                    id="password_confirmation" value="{{ old('password_confirmation') }}"
                                     class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                                @error('password_confirmation')
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <p class="mt-4 text-sm text-red-600">

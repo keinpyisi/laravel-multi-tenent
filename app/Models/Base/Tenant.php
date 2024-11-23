@@ -19,6 +19,7 @@ class Tenant extends Model {
         'domain',
         'database',
         'kana',
+        'logo',
         'genre',
         'person_in_charge',
         'tel',

@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Base\Tenant;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Client_Validation;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -44,15 +45,14 @@ class TenantController extends Controller {
         return view('admin.pages.tenants.create');
     }
 
-    public function store(Request $request) {
-        dd($request);
-        // $validator = Validator::make($request->all(), [
-        //     "name" => ["required"],
-        // ]);
-
-        // if ($validator->fails()) {
-        //     return $this->error_send(new ValidationException($validator), "A-006", 422);
-        // }
+    public function store(Client_Validation $request) {
+        // Validation logic
+        if ($request->fails()) {
+            return redirect()->back()->withInput();
+        }
+        $account_name = $request->account_name;
+        $domain = $account_name;
+        $database = $account_name;
     }
 
     public function show(int $id) {
