@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\Base\Tenant;
+use App\Models\Tenant\Tenant;
 use App\Models\Tenant\MstUserAuth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
@@ -14,7 +14,7 @@ return new class extends Migration {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('login_id');
-            $table->string('email')->unique();
+            $table->string('email')->unique()->nullable();
             $table->string('user_name');
             $table->string('password');
             $table->foreignIdFor(MstUserAuth::class)->default('0');

@@ -118,4 +118,32 @@ document.addEventListener('DOMContentLoaded', () => {
       instance.element.value = dateStr.replace('to', '-');
     },
   });
+
+  // Display success message if present
+  if (window.Laravel && window.Laravel.success) {
+    Swal.fire({
+        icon: 'success',
+        title: window.Laravel.success.title,
+        text: window.Laravel.success.text,
+    });
+}
+
+// Display error message if present
+if (window.Laravel && window.Laravel.error) {
+    Swal.fire({
+        icon: 'error',
+        title: window.Laravel.error.title,
+        text: window.Laravel.error.text,
+    });
+}
+if (window.Laravel.error) {
+    // handle error display
+    console.log(window.Laravel.error);
+}
+
+if (window.Laravel.success) {
+    // handle success display
+    console.log(window.Laravel.success);
+}
+
 });

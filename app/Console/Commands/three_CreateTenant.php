@@ -38,8 +38,8 @@ class three_CreateTenant extends Command {
         // Check if the tenants table exists in the base_tenants schema
         $tenantTableExists = DB::select("
             SELECT EXISTS (
-                SELECT FROM information_schema.tables 
-                WHERE table_schema = 'base_tenants' 
+                SELECT FROM information_schema.tables
+                WHERE table_schema = 'base_tenants'
                 AND table_name = 'tenants'
             )
         ")[0]->exists;
@@ -127,6 +127,12 @@ class three_CreateTenant extends Command {
         if (!file_exists($gitignorePath)) {
             file_put_contents($gitignorePath, "*\n!.gitignore\n");
             $this->info("Created .gitignore in tenants directory");
+        }
+        // Create a 'logo' subfolder inside the tenant folder
+        $logoFolder = tenant_path($domain, 'logo');
+        if (!file_exists($logoFolder)) {
+            mkdir($logoFolder, 0755, true);
+            $this->info("Created logo in tenants directory");
         }
     }
 }
