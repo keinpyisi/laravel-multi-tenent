@@ -21,6 +21,7 @@
         <div class="flex flex-col gap-10">
             @php
                 $headers = ['ID', 'クライアントの名前', '備考', '操作'];
+                $rows[] = [];
                 foreach ($tenents as $tenent) {
                     $rows[] = [
                         $tenent->id,

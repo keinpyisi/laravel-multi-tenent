@@ -7,7 +7,8 @@
         </div>
 
         <div class="mt-5 md:mt-0 md:col-span-2">
-            <form action="{{ route('admin.tenants.store') }}" id="create-tenant" method="POST">
+            <form action="{{ route('admin.tenants.store') }}" id="create-tenant" method="POST"
+                enctype="multipart/form-data">
                 @csrf
                 <div class="px-4 py-5 bg-white dark:bg-gray-800 shadow sm:rounded-md">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -46,6 +47,9 @@
                             <div class="mb-4">
                                 <x-admin::input-field type="file" label="ロゴ*" name="logo" id="logo"
                                     class="mt-1 block w-full" />
+                                @error('logo')
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="mb-4">

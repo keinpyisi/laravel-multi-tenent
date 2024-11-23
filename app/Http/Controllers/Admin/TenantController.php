@@ -3,10 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 
+use Exception;
 use App\Models\Base\Tenant;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Artisan;
 use App\Http\Requests\Client_Validation;
+use App\Models\Tenant\User;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -46,14 +52,88 @@ class TenantController extends Controller {
     }
 
     public function store(Client_Validation $request) {
-        // Validation logic
-        if ($request->fails()) {
-            return redirect()->back()->withInput();
+        try {
+            DB::beginTransaction();
+
+            // Merge additional data into the request
+            $request->merge([
+                'insert_user_id' => 1,
+                'update_user_id' => 1,
+                'domain' => $request->account_name,
+                'database' => $request->account_name,
+            ]);
+
+            // Handle file upload for logo
+            $data = $request->all();
+            $this->createCustomFolder($data['domain']);
+
+            if ($request->hasFile('logo')) {
+                $logo = $request->file('logo');
+                $logoName = $logo->getClientOriginalName();
+                $tenantLogoPath = 'tenants/' . $data['domain'] . '/logo';
+
+                // Store the logo file using Storage::putFileAs
+                $logoPath = $logo->storeAs($tenantLogoPath, $logoName, 'local');
+                $data['logo'] = $logoPath;
+            } else {
+                Log::error('Logo file upload failed for tenant: ' . $data['domain']);
+            }
+
+            // Add tenant unique key
+            $data['tenent_unique_key'] = Str::uuid()->toString();  // Ensure spelling matches the database column
+
+            // Create the Tenant with the validated data
+            $tenant = Tenant::create($data);
+
+            // Handle schema creation and migrations
+            $this->createSchema($data['database']);
+            DB::statement("SET search_path TO {$data['database']}");
+            $this->runTenantMigrations($data['database']);
+
+            DB::statement("SET search_path TO base_tenants");
+
+            DB::commit();
+
+            DB::beginTransaction();
+
+            DB::statement("SET search_path TO {$data['database']}");
+            $tenant = \App\Models\Tenant\Tenant::create($data);
+
+            User::create([
+                'login_id' => $data['login_id'],
+                'user_name' => $data['login_id'],
+                'password' => bcrypt($data['login_id']), // Hash the password
+                'tenant_id' => $tenant->id,
+
+            ]);
+            DB::statement("SET search_path TO base_tenants");
+
+            DB::commit();
+
+            // Redirect to the tenant's index with success
+            return redirect()->route('admin.tenants.index')->with(
+                'success',
+                [
+                    'title' => __('lang.success_title'),
+                    'text' => __('lang.success', ['attribute' => $data['client_name']]),
+                ]
+            );
+        } catch (Exception $ex) {
+            Log::error($ex);
+            Log::error('Error occurred during tenant creation: ', ['exception' => $ex->getMessage()]);
+
+            DB::rollBack();
+
+            return redirect()->route('admin.tenants.index')->with('error', [
+                'title' => __('lang.error_title'),
+                'text' => __('lang.error', ['attribute' => $ex->getMessage()]),
+            ]);
+        } finally {
+            // Always reset search path back to base_tenants in case of failure
+            DB::statement("SET search_path TO base_tenants");
         }
-        $account_name = $request->account_name;
-        $domain = $account_name;
-        $database = $account_name;
     }
+
 
     public function show(int $id) {
         // $r = [
@@ -81,5 +161,50 @@ class TenantController extends Controller {
     }
 
     public function destroy(int $id) {
+    }
+    private function createSchema($name) {
+        DB::statement("CREATE SCHEMA \"$name\"");
+    }
+
+    private function runTenantMigrations($schema) {
+        // Set the search path to the tenant's schema
+        DB::statement("SET search_path TO \"$schema\"");
+
+        // Run the migrations
+        Artisan::call('migrate', [
+            '--path' => 'database/migrations/tenant',
+            '--force' => true,
+        ]);
+
+        // Reset the search path
+        DB::statement("SET search_path TO public");
+    }
+
+    private function createCustomFolder($domain) {
+        $customFolder = tenant_path($domain);
+
+        // Create the main tenant folder if it doesn't exist
+        if (!file_exists($customFolder)) {
+            mkdir($customFolder, 0755, true);
+
+            // Create additional subdirectories if needed
+            mkdir(tenant_path($domain, 'files'), 0755, true);
+            mkdir(tenant_path($domain, 'cache'), 0755, true);
+
+            // Ensure the web server has write permissions
+            chmod($customFolder, 0775);
+        }
+
+        // Create a 'logo' subfolder inside the tenant folder
+        $logoFolder = tenant_path($domain, 'logo');
+        if (!file_exists($logoFolder)) {
+            mkdir($logoFolder, 0755, true);
+        }
+
+        // Create a .gitignore file to prevent tenant data from being committed
+        $gitignorePath = storage_path('tenants/.gitignore');
+        if (!file_exists($gitignorePath)) {
+            file_put_contents($gitignorePath, "*\n!.gitignore\n");
+        }
     }
 }

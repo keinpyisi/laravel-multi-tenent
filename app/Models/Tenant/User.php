@@ -2,7 +2,7 @@
 
 namespace App\Models\Tenant;
 
-use App\Models\Base\Tenant;
+use App\Models\Tenant\Tenant;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -29,7 +29,7 @@ class User extends Authenticatable {
         'email_verified_at' => 'datetime',
     ];
 
-    public function tenent(): HasOne {
-        return $this->hasOne(Tenant::class, "id", "tenand_id");
+    public function tenant(): HasOne {
+        return $this->hasOne(Tenant::class, "id", "tenant_id");
     }
 }
