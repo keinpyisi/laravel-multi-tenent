@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -148,6 +149,18 @@ class TenantController extends Controller {
             DB::statement("SET search_path TO base_tenants");
 
             DB::commit();
+            $randomPassword = Str::random(8);
+            $hashedPassword = Hash::make($randomPassword);
+            // Prepare the htpasswd line
+            $htpasswdLine = "{$data['database']}:{$hashedPassword}";
+            // Check if the file exists
+            if (!Storage::disk('tenant')->exists('.htpasswd')) {
+                // If the file doesn't exist, create it
+                Storage::disk('tenant')->put('.htpasswd', $htpasswdLine . PHP_EOL);
+            } else {
+                // If the file exists, append the new user data
+                Storage::disk('tenant')->append('.htpasswd', $htpasswdLine . PHP_EOL);
+            }
 
             // Redirect to the tenant's index with success
             return redirect()->route('admin.tenants.index')->with(
@@ -190,6 +203,16 @@ class TenantController extends Controller {
             // Return 404 if validation fails
             abort(404);
         }
+        $header_js_defines = [
+            'resources/js/clients/show.js',
+        ];
+        $header_css_defines = [
+            //'resources/css/clients/index.css',
+        ];
+
+        // Share the variable globally
+        view()->share('header_js_defines', $header_js_defines);
+        view()->share('header_css_defines', $header_css_defines);
 
         $tenant = Tenant::findOrFail($id);
         DB::statement("SET search_path TO {$tenant->database}");
@@ -381,6 +404,50 @@ class TenantController extends Controller {
                 'text' => __('lang.error', ['attribute' => $ex->getMessage()]),
             ]);
         }
+    }
+
+    public function reset_basic($domain) {
+        $randomPassword = Str::random(8);
+        $hashedPassword = Hash::make($randomPassword);
+        $username = $domain; // Assuming the username is in $data['database']
+
+        $htpasswdFilePath = '.htpasswd';
+        $htpasswdLine = "{$username}:{$hashedPassword}";
+
+        // Check if the file exists
+        if (Storage::disk('tenant')->exists($htpasswdFilePath)) {
+            // Read the existing contents of the file
+            $fileContents = Storage::disk('tenant')->get($htpasswdFilePath);
+
+            // Check if the username exists in the file
+            $lines = explode(PHP_EOL, $fileContents);
+            $userExists = false;
+
+            foreach ($lines as &$line) {
+                // If the username already exists, replace the line
+                if (strpos($line, "{$username}:") === 0) {
+                    $line = $htpasswdLine;
+                    $userExists = true;
+                    break;
+                }
+            }
+
+            // If the username doesn't exist, add the new entry
+            if (!$userExists) {
+                $lines[] = $htpasswdLine;
+            }
+
+            // Save the updated contents back to the file
+            Storage::disk('tenant')->put($htpasswdFilePath, implode(PHP_EOL, $lines) . PHP_EOL);
+        } else {
+            // If the file doesn't exist, create it with the new entry
+            Storage::disk('tenant')->put($htpasswdFilePath, $htpasswdLine . PHP_EOL);
+        }
+        return back()->with('success', [
+            'title' => __('lang.success_title'),
+            'text' => __('lang.success2', ['attribute' => 'Basic認証リセット']), // Ensure this lang exists
+            'basic_pass' => $randomPassword,
+        ]);
     }
     protected function dropSchema($database) {
         try {

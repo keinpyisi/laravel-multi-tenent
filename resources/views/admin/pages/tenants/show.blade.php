@@ -42,7 +42,7 @@
                         'text-gray-500 dark:text-gray-400': activeTab !== 2
                     }"
                     @click="activeTab = 2" class="py-2 px-4 text-sm font-medium focus:outline-none">
-                    Tab 3
+                    認証情報
                 </button>
             </div>
 
@@ -204,9 +204,61 @@
 
                 </div>
                 <div x-show="activeTab === 2">
-                    <!-- Content for Tab 3 -->
-                    <h3 class="text-lg font-semibold text-black dark:text-white">Tab 3 Content</h3>
-                    <p>Content for the third tab goes here.</p>
+                    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mb- max-w-3xl mx-auto py-6">
+                        <!-- Tab Navigation -->
+                        <label class="text-red-500">クライアント作成後、または、認証リセット後の同一セッション中のみ</label>
+                        <br>
+                        <label class="text-red-500">パスワードの表示、または、認証情報を一度のみダウンロードできるます。</label>
+                        <br>
+                        <label class="text-red-500">パスワードが分からなくなった場合は、リセットしてください。 </label>
+                        <!-- Tab Content -->
+                        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 rounded-lg shadow-md">
+                            <!-- Title -->
+                            <h2 class="text-xl font-semibold text-gray-800 mb-4">ユーザー情報</h2>
+
+                            <!-- Form -->
+                            <form action="{{ route('admin.tenants.reset', $tenant->domain) }}" method="POST">
+                                @csrf
+                                <div class="grid grid-cols-1 gap-4">
+                                    <!-- User Name -->
+                                    <div class="flex justify-between items-center">
+                                        <x-admin::labels label="ユーザー名"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                                        <span class="font-semibold"> {{ $tenant->domain }}</span>
+                                    </div>
+
+                                    <!-- Password -->
+                                    <div class="flex justify-between items-center">
+                                        <x-admin::labels label="パスワード"
+                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                                        @if (isset(session('success')['basic_pass']) && session('success')['basic_pass'])
+                                            <span class="font-semibold">{{ session('success')['basic_pass'] }}</span>
+                                        @else
+                                            <span class="font-semibold">********</span>
+                                        @endif
+
+                                    </div>
+                                </div>
+
+                                <!-- Reset Password Button -->
+                                <div class="mt-6 text-right">
+                                    <x-admin::button :action="[
+                                        'label' => 'Basic認証リセット',
+                                        'id' => 'basic_reset_btn',
+                                        'url' => route('admin.tenants.destroy', [$tenant->domain]),
+                                        'method' => 'DELETE',
+                                        'type' => 'button',
+                                        'which_type' => 'button',
+                                        'data-id' => $tenant->domain,
+                                        'class' =>
+                                            'basic_reset_btn transition duration-150 ease-in-out px-6 py-3 basic_reset_btn transition duration-150 ease-in-outpx-4 py-2 text-white bg-red-500',
+                                    ]">
+                                    </x-admin::button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
