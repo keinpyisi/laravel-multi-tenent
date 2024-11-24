@@ -103,19 +103,19 @@ class TenantController extends Controller {
                     if (Storage::disk('tenant')->exists($logoPath)) {
                         // Get the full path
                         $fullPath = Storage::disk('tenant')->path($logoPath);
-                        Log::error(['message' => 'File uploaded and exists', 'full_path' => $fullPath]);
+                        log_message(['message' => 'File uploaded and exists', 'full_path' => $fullPath]);
                     } else {
-                        Log::error('Error uploading logo: No File');
+                        log_message('Error uploading logo: No File');
                     }
 
                     // Save the file path to the database or log it
                     $data['logo'] = $logoPath;
                 } catch (Exception $e) {
-                    Log::error('Error uploading logo: ' . $e->getMessage());
+                    log_message('Error uploading logo: ' . $e->getMessage());
                     return back()->withErrors(['error' => ['title' => 'An error occurred while uploading the logo.']]);
                 }
             } else {
-                Log::error('Logo file upload failed for tenant: ' . $data['domain']);
+                log_message('Logo file upload failed for tenant: ' . $data['domain']);
             }
 
 
@@ -172,8 +172,8 @@ class TenantController extends Controller {
                 ]
             );
         } catch (Exception $ex) {
-            Log::error($ex);
-            Log::error('Error occurred during tenant creation: ', ['exception' => $ex->getMessage()]);
+            log_message($ex);
+            log_message('Error occurred during tenant creation: ', ['exception' => $ex->getMessage()]);
 
             DB::rollBack();
 
@@ -316,19 +316,19 @@ class TenantController extends Controller {
                     if (Storage::disk('tenant')->exists($logoPath)) {
                         // Get the full path
                         $fullPath = Storage::disk('tenant')->path($logoPath);
-                        Log::error(['message' => 'File uploaded and exists', 'full_path' => $fullPath]);
+                        log_message(['message' => 'File uploaded and exists', 'full_path' => $fullPath]);
                     } else {
-                        Log::error('Error uploading logo: No File');
+                        log_message('Error uploading logo: No File');
                     }
 
                     // Save the file path to the database or log it
                     $validatedData['logo'] = $logoPath;
                 } catch (Exception $e) {
-                    Log::error('Error uploading logo: ' . $e->getMessage());
+                    log_message('Error uploading logo: ' . $e->getMessage());
                     return back()->withErrors(['error' => ['title' => 'An error occurred while uploading the logo.']]);
                 }
             } else {
-                Log::error('Logo file upload failed for tenant: ' . $client_name);
+                log_message('Logo file upload failed for tenant: ' . $client_name);
             }
             // Update the tenant with the validated data
             $tenant->update($validatedData);
@@ -347,8 +347,8 @@ class TenantController extends Controller {
                 ]
             );
         } catch (Exception $ex) {
-            Log::error($ex);
-            Log::error('Error occurred during tenant creation: ', ['exception' => $ex->getMessage()]);
+            log_message($ex);
+            log_message('Error occurred during tenant creation: ', ['exception' => $ex->getMessage()]);
 
             DB::rollBack();
 
@@ -394,7 +394,7 @@ class TenantController extends Controller {
             ]);
         } catch (Exception $ex) {
             // Log errors
-            Log::error('Error occurred during tenant deletion: ', ['exception' => $ex->getMessage()]);
+            log_message('Error occurred during tenant deletion: ', ['exception' => $ex->getMessage()]);
 
             // Rollback transaction in case of error
             DB::rollBack();
@@ -454,7 +454,7 @@ class TenantController extends Controller {
         try {
             DB::statement("DROP SCHEMA IF EXISTS {$database} CASCADE");
         } catch (Exception $ex) {
-            Log::error('Error while dropping schema for tenant: ' . $database, ['exception' => $ex->getMessage()]);
+            log_message('Error while dropping schema for tenant: ' . $database, ['exception' => $ex->getMessage()]);
         }
     }
 

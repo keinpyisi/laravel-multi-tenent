@@ -7,6 +7,6 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-Route::get('/test',  function (Request $request) {
-    return "ETS";
-});
+// Route::get('/test',  function (Request $request) {
+//     return "ETS";
+// });
