@@ -10,6 +10,7 @@ Route::prefix('backend/{tenant}')
     ->middleware('set.tenant')  // Middleware to load tenant
     ->name('tenant.')
     ->group(function () {
+
         //public route
         Route::get('login', [AuthController::class, 'showLoginForm'])->name('users.login');
         Route::post('login', [AuthController::class, 'login'])->name('users.check_login');
