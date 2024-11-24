@@ -41,6 +41,7 @@ class TenantController extends Controller {
 
         // Fetch active tenants and paginate
         $tenents = Tenant::activeWith()->paginate(20);
+        log_message('Admin-specific log: Tenants list', $tenents);
 
         // Return the view with the paginated tenants
         return view('admin.pages.tenants.list', compact('tenents'));

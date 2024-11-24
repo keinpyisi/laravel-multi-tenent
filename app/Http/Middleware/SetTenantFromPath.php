@@ -21,6 +21,13 @@ class SetTenantFromPath {
 
         if (count($segments) >= 2 && $segments[0] === 'backend') {
             if ($segments[1] === 'admin') {
+                $tenantLogPath = storage_path('logs/admins/');
+                config(['logging.channels.tenant' => [
+                    'driver' => 'daily',
+                    'path' => $tenantLogPath . '/laravel.log',
+                    'level' => 'debug',
+                    'days' => 14, // Keep logs for 14 days
+                ]]);
                 // Admin routes
                 DB::statement("SET search_path TO base_tenants");
             } else {
