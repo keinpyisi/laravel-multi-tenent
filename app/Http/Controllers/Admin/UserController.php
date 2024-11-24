@@ -29,7 +29,7 @@ class UserController extends Controller {
 
     public function index() {
         $header_js_defines = [
-            'resources/js/admins/index.js',
+            'resources/js/users/index.js',
         ];
         $header_css_defines = [
             //'resources/css/clients/index.css',
@@ -38,13 +38,8 @@ class UserController extends Controller {
         // Share the variable globally
         view()->share('header_js_defines', $header_js_defines);
         view()->share('header_css_defines', $header_css_defines);
-
-        // Fetch active tenants and paginate
-        $tenents = Tenant::activeWith()->paginate(20);
-        log_message('Admin-specific log: Tenants list', $tenents);
-
         // Return the view with the paginated tenants
-        return view('admin.pages.tenants.list', compact('tenents'));
+        return view('admin.pages.admins.users.list');
     }
 
 
@@ -60,36 +55,6 @@ class UserController extends Controller {
         view()->share('header_css_defines', $header_css_defines);
         return view('admin.pages.tenants.create');
     }
-
-    public function store(Client_Validation $request) {
-        try {
-            DB::beginTransaction();
-
-            DB::commit();
-            // Redirect to the tenant's index with success
-            return redirect()->route('admin.tenants.index')->with(
-                'success',
-                [
-                    'title' => __('lang.success_title'),
-                    'text' => __('lang.success', ['attribute' => $data['client_name']]),
-                ]
-            );
-        } catch (Exception $ex) {
-            Log::error($ex);
-            Log::error('Error occurred during tenant creation: ', ['exception' => $ex->getMessage()]);
-
-            DB::rollBack();
-
-            return redirect()->route('admin.tenants.index')->with('error', [
-                'title' => __('lang.error_title'),
-                'text' => __('lang.error', ['attribute' => $ex->getMessage()]),
-            ]);
-        } finally {
-            // Always reset search path back to base_tenants in case of failure
-            DB::statement("SET search_path TO base_tenants");
-        }
-    }
-
 
     public function show(int $id) {
         DB::statement("SET search_path TO base_tenants");
@@ -124,64 +89,5 @@ class UserController extends Controller {
 
 
     public function edit(int $id) {
-    }
-
-    public function update(Client_Edit_Validation $request, int $id) {
-        DB::beginTransaction();
-        try {
-            DB::statement("SET search_path TO base_tenants");
-            DB::commit();
-
-            // Optionally, you can return a response or redirect
-            return redirect()->route('admin.tenants.index')->with(
-                'success',
-                [
-                    'title' => __('lang.success_title'),
-                    'text' => __('lang.success', ['attribute' => '']),
-                ]
-            );
-        } catch (Exception $ex) {
-            Log::error($ex);
-            Log::error('Error occurred during tenant creation: ', ['exception' => $ex->getMessage()]);
-
-            DB::rollBack();
-
-            return redirect()->route('admin.tenants.index')->with('error', [
-                'title' => __('lang.error_title'),
-                'text' => __('lang.error', ['attribute' => $ex->getMessage()]),
-            ]);
-        } finally {
-            // Always reset search path back to base_tenants in case of failure
-            DB::statement("SET search_path TO base_tenants");
-        }
-    }
-
-
-    public function destroy($id) {
-        try {
-            DB::beginTransaction();
-
-
-            // Commit the transaction
-            DB::commit();
-
-            // Redirect with success message
-            return redirect()->route('admin.tenants.index')->with('success', [
-                'title' => __('lang.success_title'),
-                'text' => __('lang.tenant_deleted', ['tenant' => '']), // Ensure this lang exists
-            ]);
-        } catch (Exception $ex) {
-            // Log errors
-            Log::error('Error occurred during tenant deletion: ', ['exception' => $ex->getMessage()]);
-
-            // Rollback transaction in case of error
-            DB::rollBack();
-
-            // Redirect with error message
-            return redirect()->route('admin.tenants.index')->with('error', [
-                'title' => __('lang.error_title'),
-                'text' => __('lang.error', ['attribute' => $ex->getMessage()]),
-            ]);
-        }
     }
 }

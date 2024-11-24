@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\TenantController;
-use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\Json\UserJson;
 
-Route::prefix('backend/admin')->name('admin.')->middleware('set.tenant')->group(function () {
-    Route::post('users', [UserController::class, 'store'])->name('users.store');
-    Route::put('users/{id}/update', [UserController::class, 'edit'])->name('users.update');
-    Route::delete('users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+Route::prefix('backend/admin')->name('admin.')->middleware('set.api.tenant')->group(function () {
+    Route::get('user', [UserJson::class, 'get_all'])->name('users.all');
+    Route::post('users', [UserJson::class, 'store'])->name('users.store');
+    Route::put('users/{id}/update', [UserJson::class, 'edit'])->name('users.update');
+    Route::delete('users/{id}', [UserJson::class, 'destroy'])->name('users.destroy');
 });

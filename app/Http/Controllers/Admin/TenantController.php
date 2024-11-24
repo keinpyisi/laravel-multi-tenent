@@ -44,7 +44,7 @@ class TenantController extends Controller {
         log_message('Admin-specific log: Tenants list', $tenents);
 
         // Return the view with the paginated tenants
-        return view('admin.pages.tenants.list', compact('tenents'));
+        return view('admin.pages.admins.list', compact('tenents'));
     }
 
 
@@ -58,7 +58,7 @@ class TenantController extends Controller {
         // Share the variable globally
         view()->share('header_js_defines', $header_js_defines);
         view()->share('header_css_defines', $header_css_defines);
-        return view('admin.pages.tenants.create');
+        return view('admin.pages.admins.create');
     }
 
     public function store(Client_Validation $request) {
@@ -275,7 +275,7 @@ class TenantController extends Controller {
             'total_size' => $totalSizeMB,
         ];
 
-        return view('admin.pages.tenants.show', compact('tenant', 'users', 'all_usage', 'client_usage'));
+        return view('admin.pages.admins.show', compact('tenant', 'users', 'all_usage', 'client_usage'));
     }
 
 

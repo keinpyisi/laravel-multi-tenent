@@ -1,6 +1,6 @@
-$(document).ready(function() {
+$(function() {
     var langs = window.Lang;
-    $('.basic_reset_btn').click(function(e) {
+    $('.basic_reset_btn').on('click', function(e) {
         e.preventDefault(); // Prevent the form from submitting immediately
         var tenant = $(this).data('id');
         // Perform an action when the button is clicked

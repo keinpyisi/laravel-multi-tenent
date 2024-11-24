@@ -15,4 +15,10 @@ return [
     'no' => 'いいえ',
     'delete_question' => '本当に :tenant を削除しますか?',
     'reset_question' => '本当に :tenant の :what をリセットしますか?',
+    'ask_create' => '新しい :data を作成しますか?',
+    'login_id' => 'ログイン ID',
+    'password' => 'パスワード',
+    'user_name' => 'ユーザー名',
+    'no_input' => '『 :data 』 が入力されていません。',
+    'error_input' => '入力エラー',
 ];

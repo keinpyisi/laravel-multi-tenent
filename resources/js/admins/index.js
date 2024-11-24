@@ -1,6 +1,6 @@
-$(document).ready(function() {
+$(function() {
     var langs = window.Lang;
-    $('.delete_btn').click(function(e) {
+    $('.delete_btn').on('click', function(e) {
         e.preventDefault(); // Prevent the form from submitting immediately
 
         // Perform an action when the button is clicked

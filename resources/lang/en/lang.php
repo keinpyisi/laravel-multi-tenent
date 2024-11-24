@@ -15,5 +15,11 @@ return [
     'no' => 'No',
     'delete_question' => 'Do you really want to delete :tenant ?',
     'reset_question' => 'Do you really want to reset :tenant :what ?',
+    'ask_create' => 'Do you want to create a new :data ?',
+    'login_id' => 'Login ID',
+    'password' => 'Password',
+    'user_name' => 'Username',
+    'no_input' => '『 :data 』 is not Inputted。',
+    'error_input' => 'Validation Error',
 
 ];

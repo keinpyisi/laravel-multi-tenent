@@ -87,3 +87,18 @@ if (!function_exists('log_message')) {
         return $formattedMessage;
     }
 }
+
+if (!function_exists('json_send')) {
+    /**
+     * Method api_send
+     * Making the Standard API JSON Format
+     * @param $status $status [200,300,404]
+     * @param $data $data [API Data to Sent]
+     *
+     * @return JsonResponse
+     */
+    function json_send($status, $data, $type = 'success') {
+        $response = response()->json(["status" => $status, "type" => $type, "data" => $data], $status, [], JSON_INVALID_UTF8_IGNORE);
+        return $response;
+    }
+}
