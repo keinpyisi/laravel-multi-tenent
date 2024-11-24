@@ -6,25 +6,12 @@ use Closure;
 use App\Models\Base\Tenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class SetTenantFromPath {
     public function handle($request, Closure $next) {
-        // // Hash the password using BCrypt
-        // $hashedPassword = Hash::make("system");
-
-        // // Prepare the htpasswd line
-        // $htpasswdLine = "system:{$hashedPassword}";
-
-        // // Check if the file exists
-        // if (!Storage::disk('tenant')->exists('.htpasswd')) {
-        //     // If the file doesn't exist, create it
-        //     Storage::disk('tenant')->put('.htpasswd', $htpasswdLine . PHP_EOL);
-        // } else {
-        //     // If the file exists, append the new user data
-        //     Storage::disk('tenant')->append('.htpasswd', $htpasswdLine . PHP_EOL);
-        // }
         // Basic Auth check
         if (!$this->checkBasicAuth($request)) {
             return response('Unauthorized', 401)->header('WWW-Authenticate', 'Basic realm="Restricted Area"');
@@ -50,6 +37,14 @@ class SetTenantFromPath {
                     config(['database.connections.tenant.search_path' => $tenant->database]);
                     DB::purge('tenant');
                     DB::reconnect('tenant');
+                    // Set custom daily log path for the tenant
+                    $tenantLogPath = storage_path('logs/tenants/' . $tenantSlug);
+                    config(['logging.channels.tenant' => [
+                        'driver' => 'daily',
+                        'path' => $tenantLogPath . '/laravel.log',
+                        'level' => 'debug',
+                        'days' => 14, // Keep logs for 14 days
+                    ]]);
                 } else {
                     abort(404);
                 }
