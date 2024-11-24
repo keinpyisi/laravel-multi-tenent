@@ -40,7 +40,7 @@
 
         <h2 class="text-2xl font-semibold text-center mb-6">ログイン</h2>
 
-        <form action="{{ route('admin.users.check_login') }}" method="POST">
+        <form action="{{ route('tenant.users.check_login') }}" method="POST">
             @csrf
             <!-- Email Input -->
             <div class="mb-4">

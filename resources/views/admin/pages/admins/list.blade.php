@@ -41,7 +41,7 @@
                                     'link_btn transition duration-150 ease-in-out px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
                                 'type' => 'button',
                                 'id' => 'link_btn',
-                                'url' => route('tenant.client.index', ['tenant' => $tenent->domain]), // Dynamically generating the route
+                                'url' => route('tenant.users.login', ['tenant' => $tenent->domain]), // Dynamically generating the route
                                 'method' => 'GET',
                                 'which_type' => 'submit',
                                 'target' => 'new', // This will open in a new window/tab

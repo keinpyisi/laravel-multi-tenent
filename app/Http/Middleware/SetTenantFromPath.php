@@ -44,6 +44,8 @@ class SetTenantFromPath {
                     config(['database.connections.tenant.search_path' => $tenant->database]);
                     DB::purge('tenant');
                     DB::reconnect('tenant');
+                    // Share the tenant slug with all views
+                    view()->share('tenantSlug', $tenantSlug);
                     // Set custom daily log path for the tenant
                     $tenantLogPath = storage_path('logs/tenants/' . $tenantSlug);
                     config(['logging.channels.tenant' => [

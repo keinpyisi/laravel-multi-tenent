@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Middleware\AdminAuthMiddleware;
 use App\Http\Middleware\SetApiTenantFromPath;
 use Illuminate\Foundation\Application;
 use App\Http\Middleware\SetTenantFromPath;
+use App\Http\Middleware\TenentAuthMiddleware;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
@@ -32,6 +34,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'set.tenant' => SetTenantFromPath::class,
             'set.api.tenant' => SetApiTenantFromPath::class,
+            'admin.auth' => AdminAuthMiddleware::class,
+            'tenent.auth' => TenentAuthMiddleware::class,
+
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
