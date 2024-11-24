@@ -1,56 +1,72 @@
 <x-app-layout>
-    <div class="bg-gray-900 min-h-screen p-4">
+    <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
         <div class="max-w-7xl mx-auto">
             <div class="flex items-center justify-between mb-4">
-                <h1 class="text-2xl font-bold text-white">AccountSetting</h1>
-                <div class="space-x-2">
-                    <button id="addBtn"
-                        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition">add</button>
-                    <button id="delBtn"
-                        class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition">del</button>
-                </div>
+                <h2 class="text-title-md2 font-bold text-black dark:text-white">
+                    アカウント設定
+                    </h1>
+                    <div class="space-x-2">
+                        <x-admin::button :action="[
+                            'id' => 'addBtn',
+                            'label' => '新規',
+                            'type' => 'button',
+                            'class' =>
+                                'transition duration-150 ease-in-out px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
+                        ]">
+                        </x-admin::button>
+                        <x-admin::button :action="[
+                            'id' => 'delBtn',
+                            'label' => '削除',
+                            'type' => 'button',
+                            'class' =>
+                                'transition duration-150 ease-in-out px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500',
+                        ]">
+                        </x-admin::button>
+                    </div>
             </div>
 
             <div class="mb-4">
-                <input type="text" id="searchInput" placeholder="Search..."
-                    class="w-full px-4 py-2 rounded-lg border border-gray-600 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <x-admin::input type="text" name="searchInput" id="searchInput" placeholder="検索。。。"
+                    value="{{ old('client_name') }}"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
             </div>
 
             <div class="bg-gray-800 rounded-lg shadow overflow-hidden">
-                <table class="w-full" id="dataTable">
-                    <thead>
-                        <tr class="bg-gray-700">
+                <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400" id="dataTable">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
                             <th class="p-3 text-left">
                                 <input type="checkbox" id="selectAll"
                                     class="rounded border-gray-600 text-blue-600 focus:ring-blue-500">
                             </th>
-                            <th class="p-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">ID</th>
-                            <th class="p-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">LoginId
+                            <th
+                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white uppercase tracking-wider">
+                                ID</th>
+                            <th
+                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white uppercase tracking-wider">
+                                LoginId
                             </th>
-                            <th class="p-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">User
+                            <th
+                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white uppercase tracking-wider">
+                                User
                                 Name</th>
-                            <th class="p-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Updated
+                            <th
+                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white uppercase tracking-wider">
+                                Updated
                                 Date</th>
-                            <th class="p-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Edited
+                            <th
+                                class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white uppercase tracking-wider">
+                                Edited
                                 User</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-700">
-                        <tr>
-                            <td class="p-3">
-                                <input type="checkbox"
-                                    class="rounded border-gray-600 text-blue-600 focus:ring-blue-500">
-                            </td>
-                            <td class="p-3 text-sm text-gray-300">1</td>
-                            <td class="p-3 text-sm text-gray-300">developer</td>
-                            <td class="p-3 text-sm text-gray-300">開発者</td>
-                            <td class="p-3 text-sm text-gray-300">2023-08-22 16:44:30</td>
-                            <td class="p-3 text-sm text-gray-300">開発者</td>
-                        </tr>
+                    <tbody class="divide-y divide-gray-700 admin_table">
                         <!-- Add more rows as needed -->
                     </tbody>
                 </table>
             </div>
         </div>
+        <!-- Pagination Section -->
+        <div class="mt-6 flex justify-center space-x-2" id="pagination-controls"></div>
     </div>
 </x-app-layout>

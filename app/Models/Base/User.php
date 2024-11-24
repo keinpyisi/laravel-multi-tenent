@@ -2,6 +2,8 @@
 
 namespace App\Models\Base;
 
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -26,4 +28,20 @@ class User extends Authenticatable {
         'password',
         'remember_token',
     ];
+
+    // Mutator to hash password before saving
+    public function setPasswordAttribute($value) {
+        $this->attributes['password'] = Hash::make($value);
+    }
+    // In your User model
+    public function getUpdatedAtAttribute($value) {
+        return Carbon::parse($value)->format('Y-m-d H:i:s');
+    }
+
+
+    // In the User model
+
+    public function updatedBy() {
+        return $this->belongsTo($this::class, 'update_user_id');
+    }
 }
