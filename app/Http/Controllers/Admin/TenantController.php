@@ -29,7 +29,7 @@ class TenantController extends Controller {
 
     public function index() {
         $header_js_defines = [
-            'resources/js/clients/index.js',
+            'resources/js/admins/index.js',
         ];
         $header_css_defines = [
             //'resources/css/clients/index.css',
@@ -50,7 +50,7 @@ class TenantController extends Controller {
 
     public function create() {
         $header_js_defines = [
-            'resources/js/clients/create.js',
+            'resources/js/admins/create.js',
         ];
         $header_css_defines = [
             //'resources/css/clients/index.css',
@@ -205,7 +205,7 @@ class TenantController extends Controller {
             abort(404);
         }
         $header_js_defines = [
-            'resources/js/clients/show.js',
+            'resources/js/admins/show.js',
         ];
         $header_css_defines = [
             //'resources/css/clients/index.css',
