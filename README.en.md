@@ -1,5 +1,5 @@
-- [English](README.en.md)
-- [日本語](README.md)
+-   [English](README.en.md)
+-   [日本語](README.md)
 
 # Laravel で複数のクライアント作成
 
