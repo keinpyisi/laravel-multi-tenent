@@ -85,20 +85,29 @@
                     </x-admin::button>
                 </div>
             </form>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-title-md2 font-bold text-black dark:text-white">管理設定</h2>
+            </div>
+            <div class="bg-gray-800 rounded-lg shadow">
 
-            <div class="mt-8">
-                <h2 class="text-xl font-semibold mb-4">管理設定</h2>
-                <table class="w-full">
-                    <thead>
-                        <tr class="bg-gray-200 dark:bg-gray-600">
-                            <th class="p-2 text-left">Client Name</th>
-                            <th class="p-2 text-left">対象</th>
-                            <th class="p-2 text-left">メンテナンスモード</th>
-                            <th class="p-2 text-left">期間</th>
+                <table class="bg-gray-100 w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
+                    id="dataTable">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-500 dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th
+                                class="px-6 py-4 font-medium text-black-900 whitespace-nowrap dark:text-white uppercase tracking-wider">
+                                Client Name</th>
+                            <th
+                                class="px-6 py-4 font-medium text-black-900 whitespace-nowrap dark:text-white uppercase tracking-wider">
+                                対象
+                            </th>
+                            <th
+                                class="px-6 py-4 font-medium text-black-900 whitespace-nowrap dark:text-white uppercase tracking-wider">
+                                期間</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Add table rows here -->
+                    <tbody class="divide-y divide-gray-700 tenant_table">
+                        <!-- Add more rows as needed -->
                     </tbody>
                 </table>
             </div>
