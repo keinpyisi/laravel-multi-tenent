@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\TenantController;
+use App\Http\Controllers\Admin\MaitenanceController;
 
 Route::prefix('backend/admin')->name('admin.')->middleware('set.tenant')->group(function () {
 
@@ -13,6 +14,7 @@ Route::prefix('backend/admin')->name('admin.')->middleware('set.tenant')->group(
 
     Route::middleware(['admin.auth'])->group(function () {
         Route::resource('tenants', TenantController::class);
+        Route::resource('maitenance', MaitenanceController::class);
         Route::post('tenants/{domain}/reset', [TenantController::class, 'reset_basic'])->name('tenants.reset');
 
         Route::get('users', [UserController::class, 'index'])->name('users.index');

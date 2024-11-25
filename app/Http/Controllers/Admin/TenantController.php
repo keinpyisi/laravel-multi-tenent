@@ -89,13 +89,6 @@ class TenantController extends Controller {
 
                     // Define the directory structure (corrected path)
                     $tenantLogoPath = $data['domain'] . '/logo';  // No need to include 'tenants/'
-
-                    // Ensure the directory exists
-                    $logoDirectory = storage_path('app/tenants/' . $tenantLogoPath);  // Ensure the full path includes 'tenants/'
-                    if (!is_dir($logoDirectory)) {
-                        mkdir($logoDirectory, 0775, true);  // Create directory if it doesn't exist
-                    }
-
                     // Store the file in the specified location
                     $logoPath = $logo->storeAs($tenantLogoPath, $logoName, 'tenant');
 
