@@ -1,24 +1,28 @@
+Here's the translation of the provided text:
+
+---
+
 -   [English](README.en.md)
 -   [日本語](README.md)
 
-# Laravel で複数のクライアント作成
+# Creating Multiple Clients in Laravel
 
-こちらは　 CodeIgniter の BaseClient みたいな　複数のクライアントを管理できる Laravel の環境です。
+This is a Laravel environment that can manage multiple clients, similar to CodeIgniter's BaseClient.
 
-管理画面は Tailwind CSS で書いております。　モデルなどは SweetAlert2 を使用していますが　個別の　テネット「クライアント」　などは　 <em><strong>自分で作成</em></strong> しても　大丈夫です。
+The admin panel is written with Tailwind CSS. Models and other elements use SweetAlert2, but you can <em><strong>create your own individual tenant "clients"</strong></em> if necessary.
 
-ここでは　 Ajax では無くて Axios を使用しております。Ajax はセキュリティーには　弱いですので。。
+In this project, we use Axios instead of Ajax because Ajax is weak in terms of security.
 
-参考：[OWASP](https://cheatsheetseries.owasp.org/cheatsheets/AJAX_Security_Cheat_Sheet.html)
+Reference: [OWASP](https://cheatsheetseries.owasp.org/cheatsheets/AJAX_Security_Cheat_Sheet.html)
 
-## セットアップ
+## Setup
 
-Composer を [インストール](https://getcomposer.org/download/)してください。
-バージョンはどれでも　大丈夫です。
+Please [install Composer](https://getcomposer.org/download/).
+Any version will work fine.
 
-NodeJS v23 を [インストール](https://nodejs.org/en/download/package-manager) してください。理由は JS などを書く時自動で Minify と暗号化してくれます。
+Install NodeJS v23 [here](https://nodejs.org/en/download/package-manager). The reason for this is that it automatically minifies and encrypts JS when writing.
 
-そして　ここに　 CMD を　開けて
+Then, open CMD here and run:
 
 ```bash
 composer install
@@ -28,144 +32,147 @@ composer install
 npm install
 ```
 
-もし NPM がインストールできなかったら　 npm update で新しいバージョンをアップグレードしても大丈夫です。
+If you can't install NPM, it's fine to upgrade to the latest version using `npm update`.
 
-<em><strong> Laravel のバージョンもアップグレードしたい時　なにも気にしなくて　これで　大丈夫です。</em></strong>
+<em><strong>If you want to upgrade Laravel as well, you don't need to worry about it, just run this:</strong></em>
 
 ```bash
 composer update
 ```
 
-そして　.env.local をコピーして　こちらで　新しいキーをしてください。
+Next, copy the `.env.local` file and set a new key.
 
-<em><strong> サーバーからのデータをみたいなときに.env の APP_KEY をサーバーでの　キーと　合わせてください。</em></strong>
+<em><strong>When you want to view data from the server, make sure the APP_KEY in .env matches the key on the server.</strong></em>
 
 ```bash
-php artisan:key generate
+php artisan key:generate
 ```
 
-そして　 PostgresSQL で DB を作成します。　作成が終わったら　.env で　こういう感じでにしてください。
+Now, create a database in PostgreSQL. Once done, set it like this in `.env`:
 
 ```bash
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
 DB_PORT=5432
-DB_DATABASE=作成したDB名
-DB_USERNAME=DBのユーザー名
-DB_PASSWORD=DBのパスワード
+DB_DATABASE=YourCreatedDBName
+DB_USERNAME=YourDBUsername
+DB_PASSWORD=YourDBPassword
 ```
 
-こちらなどを　終わったら　ベースになるスキマを作成しましょう。
+After this, let's create the base schema.
 
-CMD で実行してください。
+Run this in CMD.
 
-こちらは base_client というスキマを作成してくれます。　ここでは　管理画面の情報などを保管されます。
+This will create the `base_client` schema, where admin panel information is stored.
 
 ```bash
 php artisan tenant:create-base-schema --seed
 ```
 
-管理画面の開発者のユーザー名とパスワードは ここにあります。　こちらは　変更しても大丈夫です。
+You can find the developer's username and password for the admin panel here. Feel free to change it.
 
 ```bash
-database\seeders\AdminSeeder.php
+database/seeders/AdminSeeder.php
 ```
 
-そして base_client のスキマを作成しましょ。。
+Now, let's create the `base_client` schema.
 
 ```bash
 php artisan setup:base-client --seed
 ```
 
-ここでは　クライアントのベースになる DB を作成されます。
+This will create the base DB for clients.
 
-そして　ローカル　なら　ば　 2 つの CMD を開けます。
+If you're working locally, open two CMD windows.
 
-そして　２つの CMD で　１つつ　実行します。
+Then, run the following in one of them:
 
 ```bash
 php artisan serve
 ```
 
+In the other:
+
 ```bash
 npm run dev
 ```
 
-これら　実行されているときは　開発できます。
+While these are running, you can develop.
 
-## リリース準備
+## Release Preparation
 
-リリースする時に　必ずこちらを　実行し　/public/build/を　全てアップしてください。
+Before releasing, always run this and upload everything from `/public/build/`:
 
 ```bash
 npm run build
 ```
 
-## 開発する時　必ずこちらの手順をしてください。　しないと　エラー発生されます。
+## Development Process (Make Sure to Follow These Steps or Errors May Occur)
 
-こちらは　 database/migrations/tenant で　新しい migration ファイルを作成してくれます。
+Here’s how to create a new migration file under `database/migrations/tenant`:
 
 ```bash
 php artisan make:tenant-migration create_posts_table --create=posts
 ```
 
-テーブルを更新してい時はこちらでお願いします。
+When updating a table, use this:
 
 ```bash
 php artisan make:tenant-migration add_status_to_posts_table --table=posts
 ```
 
-base_tenent i.e 　管理テーブルにしたいときは　こちらをお願い致します。
+To make it a base tenant (admin table), use this:
 
 ```bash
 php artisan make:migration create_example_table --path=database/migrations/base
 ```
 
-<em><strong> そして　上の手順が終わったら　必ず　必ず　こちらを　実行してください。 </em></strong>
+<em><strong>Once you finish the steps above, make sure to run this:</strong></em>
 
 ```bash
 php artisan tenants:migrate
 ```
 
-<em><strong> それを実行しないで　普通の Laravel みたいな　こちらを実行したら　エラー発生されます。</em></strong>
+<em><strong>If you run the usual Laravel migration command without this, it will cause errors.</strong></em>
 
 ```bash
 php artisan migrate
 ```
 
-## Tenent 作成を開発する時の使い方
+## Using Tenants During Development
 
-Route をしたら　テネットのばいは　こちらが　必要です。
+When routing, you need to specify the tenant:
 
-理由はこの tenent がないと テネット個人の Middleware が動かなくなります。
+The reason is that without this tenant, the tenant-specific middleware won't work.
 
-JS で URL をしても　同じです。　 JS のパラメーターは自分で送ってください。
+Even when using JS, you need to send the parameters yourself.
 
 ```bash
-{{ route('tenant.users.check_login', ['tenant' => $tenant_name] // <- ['tenant'])が必要 }}
+{{ route('tenant.users.check_login', ['tenant' => $tenant_name]) }}
 ```
 
-## JS のインストール仕方
+## Installing JS
 
-NPM か CDN でインストールしてください。NPM でしないと　 JS が使えないです。
+Install it via NPM or CDN. Without NPM, you can’t use JS.
 
-理由はこの Vite が JS などを Minify と暗号化してくれるからです。
-冷：
+The reason is that Vite minifies and encrypts JS for you.
+
+Example:
 
 ```bash
 npm install sweetalert2
 ```
 
-## AXIOS の使い方
+## Using AXIOS
 
-非同期
+Asynchronous:
 
 ```bash
 const response = await axios.post('/api/backend/admin/tenent_users', data);
 console.log(response);
 ```
 
-同期
+Synchronous:
 
 ```bash
 axios.post('/api/persons/unique/alias', {
@@ -180,142 +187,118 @@ axios.post('/api/persons/unique/alias', {
     });
 ```
 
-そして Laravel の PUT と DELETE を使う時に必ず \_method でしてください。
+When using Laravel’s PUT and DELETE, make sure to add `_method`:
 
-Laravel のセキュリティーです。
+This is for Laravel security.
 
 ```bash
- var data = {  _method: 'DELETE' };
- const response = await axios.post('/api/backend/admin/tenent_users', data);
- var data = {  _method: 'PUT' };
- const response = await axios.post('/api/backend/admin/tenent_users', data);
-
+var data = { _method: 'DELETE' };
+const response = await axios.post('/api/backend/admin/tenent_users', data);
+var data = { _method: 'PUT' };
+const response = await axios.post('/api/backend/admin/tenent_users', data);
 ```
 
-## SweetAlert2 の使い方
+## Using SweetAlert2
 
 ```bash
 Swal.fire({
-                    icon: 'question',
-                    title: langs.ask_create.replace(':data', '各サイトのメンテナンス'),
-                    html: data.modal_html,
-                    focusConfirm: false,
-                    showCancelButton: true,
-                    confirmButtonText: langs.yes,
-                    cancelButtonText: langs.no,
-                    customClass: {
-                        input: 'my-swal-input',
-                        confirmButton: 'btn btn-primary custom-confirm-button',
-                        cancelButton: 'btn btn-secondary'
-                    },
-                    allowOutsideClick: false,
-                    allowEscapeKey: false,
-                    preConfirm: () => {
-                        // This callback will return false initially, preventing the modal from closing
-                        return false;
-                    },
+    icon: 'question',
+    title: langs.ask_create.replace(':data', 'Maintenance for each site'),
+    html: data.modal_html,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: langs.yes,
+    cancelButtonText: langs.no,
+    customClass: {
+        input: 'my-swal-input',
+        confirmButton: 'btn btn-primary custom-confirm-button',
+        cancelButton: 'btn btn-secondary'
+    },
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    preConfirm: () => {
+        return false; // Prevent modal from closing initially
+    },
+    didOpen: () => {
+        var frontSiteChecked = jsonData?.front_site === 'frontend' ? true : false;
+        var backSiteChecked = jsonData?.back_site === 'backend' ? true : false;
+        var maintenanceMode = jsonData?.maintenance_0;
+        var maintenanceTermStart = jsonData?.maintenance_term?.maintanance_term_start || '';
+        var maintenanceTermEnd = jsonData?.maintenance_term?.maintanance_term_end || '';
+        var allowIp = jsonData?.allow_ip?.join('\n'); // Join IPs with newline separator
+        var frontMessage = jsonData?.front_main_message || '';
+        var backMessage = jsonData?.back_main_message || '';
 
-                    didOpen: () => {
-                        var frontSiteChecked = jsonData?.front_site === 'frontend' ? true : false;
-                        var backSiteChecked = jsonData?.back_site === 'backend' ? true : false;
-                        var maintenanceMode = jsonData?.maintenance_0;
-                        var maintenanceTermStart = jsonData?.maintenance_term?.maintanance_term_start || '';
-                        var maintenanceTermEnd = jsonData?.maintenance_term?.maintanance_term_end || '';
-                        var allowIp = jsonData?.allow_ip?.join('\n'); // Join IPs with newline separator
-                        var frontMessage = jsonData?.front_main_message || '';
-                        var backMessage = jsonData?.back_main_message || '';
-                        console.log([frontSiteChecked,
-                            backSiteChecked,
-                            maintenanceMode,
-                            maintenanceTermStart,
-                            maintenanceTermEnd,
-                            allowIp,
-                            frontMessage,
-                            backMessage
-                        ]);
-                        // Collect form data from the modal
-                        // Set checkbox values based on boolean
-                        $('input[name="front_site_modal"]').prop('checked', frontSiteChecked);
-                        $('input[name="back_site_modal"]').prop('checked', backSiteChecked);
-                        $('input[name="maintenance_0_modal"][value="' + maintenanceMode + '"]').prop('checked', true);
-                        // Set the textarea values
-                        $('textarea[name="allow_ip_modal"]').val(allowIp);
-                        $('textarea[name="front_main_message_modal"]').val(frontMessage);
-                        $('textarea[name="back_main_message_modal"]').val(backMessage);
+        // Update modal values
+        $('input[name="front_site_modal"]').prop('checked', frontSiteChecked);
+        $('input[name="back_site_modal"]').prop('checked', backSiteChecked);
+        $('input[name="maintenance_0_modal"][value="' + maintenanceMode + '"]').prop('checked', true);
+        $('textarea[name="allow_ip_modal"]').val(allowIp);
+        $('textarea[name="front_main_message_modal"]').val(frontMessage);
+        $('textarea[name="back_main_message_modal"]').val(backMessage);
 
-                        // If you want to populate a label or another element:
-                        $('#maintenance_term_modal').text(maintenanceTermStart + ' to ' + maintenanceTermEnd);
-                        flatpickr("#maintenance_term_modal", {
-                            mode: 'range',
-                            enableTime: true,
-                            dateFormat: "Y-m-d H:i:S",
-                            time_24hr: true,
-                            defaultDate: [
-                                $('#maintenance_term_modal').data('start'),
-                                $('#maintenance_term_modal').data('end')
-                            ]
+        $('#maintenance_term_modal').text(maintenanceTermStart + ' to ' + maintenanceTermEnd);
+        flatpickr("#maintenance_term_modal", {
+            mode: 'range',
+            enableTime: true,
+            dateFormat: "Y-m-d H:i:S",
+            time_24hr: true,
+            defaultDate: [$('#maintenance_term_modal').data('start'), $('#maintenance_term_modal').data('end')]
+        });
+
+        const confirmButton = Swal.getConfirmButton();
+        if (confirmButton) {
+            confirmButton.addEventListener('click', async () => {
+                var frontSiteChecked = $('input[name="front_site_modal"]:checked').val();
+                var backSiteChecked = $('input[name="back_site_modal"]:checked').val();
+                var maintenanceMode = $('input[name="maintenance_0_modal"]:checked').val();
+                var maintenanceTerm = $('input[name="maintenance_term_modal"]').val();
+                var allowIp = $('textarea[name="allow_ip_modal"]').val();
+                var frontMessage = $('textarea[name="front_main_message_modal"]').val();
+                var backMessage = $('textarea[name="back_main_message_modal"]').val();
+
+                // Prepare form data
+                var formData = new FormData();
+                formData.append('front_site', frontSiteChecked);
+                formData.append('back_site', backSiteChecked);
+                formData.append('maintenance_0', maintenanceMode);
+                formData.append('maintenance_term', maintenanceTerm);
+                formData.append('allow_ip', allowIp);
+                formData.append('front_main_message', frontMessage);
+                formData.append('back_main_message', backMessage);
+                formData.append('tenant', user_id);
+                formData.append('_method', 'PUT');
+
+                try {
+                    const response = await axios.post(`/api/backend/admin/maitenances/${user_id}/update`, formData);
+
+                    if (response.data.type === 'error') {
+                        var errorMessages = response.data.data;
+                        var errorMessage = errorMessages.join('<br>');
+                        Swal.showValidationMessage(errorMessage.trim());
+                        return;
+                    } else {
+                        Swal.close();
+                        Swal.fire({
+                            icon: 'success',
+                            title: langs.success_title,
+                            text: langs.success.replace(':attribute', langs.account),
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.reload();
+                            }
                         });
-                        const confirmButton = Swal.getConfirmButton();
-                        if (confirmButton) {
-                            confirmButton.addEventListener('click', async () => {
-                                // Collect form data from the modal
-                                var frontSiteChecked = $('input[name="front_site_modal"]:checked').val();
-                                var backSiteChecked = $('input[name="back_site_modal"]:checked').val();
-                                var maintenanceMode = $('input[name="maintenance_0_modal"]:checked').val();
-                                var maintenanceTerm = $('input[name="maintenance_term_modal"]').val();
-                                var allowIp = $('textarea[name="allow_ip_modal"]').val();
-                                var frontMessage = $('textarea[name="front_main_message_modal"]').val();
-                                var backMessage = $('textarea[name="back_main_message_modal"]').val();
-
-                                // Create FormData object
-                                var formData = new FormData();
-                                // Add other form fields
-                                formData.append('front_site', frontSiteChecked);
-                                formData.append('back_site', backSiteChecked);
-                                formData.append('maintenance_0', maintenanceMode);
-
-                                formData.append('maintenance_term', maintenanceTerm);
-                                formData.append(`allow_ip`, allowIp);
-
-                                formData.append('front_main_message', frontMessage);
-                                formData.append('back_main_message', backMessage);
-                                formData.append('tenant', user_id);
-                                formData.append('_method', 'PUT');
-
-                                try {
-                                    const response = await axios.post(`/api/backend/admin/maitenances/${user_id}/update`, formData);
-
-                                    if (response.data.type === 'error') {
-                                        var errorMessages = response.data.data;
-                                        var errorMessage = errorMessages.join('<br>');
-
-                                        Swal.showValidationMessage(errorMessage.trim());
-                                        return; // Keep the modal open if validation fails
-                                    } else {
-                                        Swal.close();
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: langs.success_title,
-                                            text: langs.success.replace(':attribute', langs.account),
-                                            confirmButtonText: 'OK'
-                                        }).then((result) => {
-                                            if (result.isConfirmed) {
-                                                // Reload the page after the user clicks "OK"
-                                                window.location.reload();
-                                            }
-                                        });
-                                    }
-                                } catch (error) {
-                                    console.error(error);
-                                    Swal.fire('Error!', 'There was an issue with your request.', 'error');
-                                    return; // Keep the modal open in case of request failure
-                                }
-                                // AJAX form submission
-
-                            });
-                        }
                     }
-                });
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire('Error!', 'There was an issue with your request.', 'error');
+                    return;
+                }
+            });
+        }
+    }
+});
 ```
 
-以上
+That’s all!
