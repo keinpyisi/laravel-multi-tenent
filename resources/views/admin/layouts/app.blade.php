@@ -21,13 +21,13 @@
         window.Lang = @json(__('lang')); // Assuming 'lang' is your language file
     </script>
     <!-- Scripts -->
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/js/app.js', 'resources/css/app.css'])
     <!-- Include additional JS from child view if provided -->
     @if (isset($header_js_defines) && !empty($header_js_defines))
-        @vite($header_js_defines)
+    @vite($header_js_defines)
     @endif
     @if (isset($header_css_defines) && !empty($header_css_defines))
-        @vite($header_css_defines)
+    @vite($header_css_defines)
     @endif
     <!-- Styles -->
     @livewireStyles
@@ -44,7 +44,9 @@
 </head>
 
 <body class="font-inter antialiased bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400"
-    :class="{ 'sidebar-expanded': sidebarExpanded }" x-data="{ sidebarOpen: false, sidebarExpanded: localStorage.getItem('sidebar-expanded') == 'true' }" x-init="$watch('sidebarExpanded', value => localStorage.setItem('sidebar-expanded', value))">
+    :class="{ 'sidebar-expanded': sidebarExpanded }"
+    x-data="{ sidebarOpen: false, sidebarExpanded: localStorage.getItem('sidebar-expanded') == 'true' }"
+    x-init="$watch('sidebarExpanded', value => localStorage.setItem('sidebar-expanded', value))">
 
     <script>
         if (localStorage.getItem('sidebar-expanded') == 'true') {
