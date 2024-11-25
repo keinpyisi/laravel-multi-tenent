@@ -1,66 +1,307 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel で複数のクライアント作成
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+こちらは　 CodeIgniter の BaseClient みたいな　複数のクライアントを管理できる Laravel の環境です。
 
-## About Laravel
+管理画面は Tailwind CSS で書いております。　モデルなどは SweetAlert2 を使用していますが　個別の　テネット「クライアント」　などは　 <em><strong>自分で作成</em></strong> しても　大丈夫です。
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+ここでは　 Ajax では無くて Axios を使用しております。Ajax はセキュリティーには　弱いですので。。
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+参考：[OWASP](https://cheatsheetseries.owasp.org/cheatsheets/AJAX_Security_Cheat_Sheet.html)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## セットアップ
 
-## Learning Laravel
+Composer を [インストール](https://getcomposer.org/download/)してください。
+バージョンはどれでも　大丈夫です。
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+NodeJS v23 を [インストール](https://nodejs.org/en/download/package-manager) してください。理由は JS などを書く時自動で Minify と暗号化してくれます。
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+そして　ここに　 CMD を　開けて
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```bash
+composer install
+```
 
-## Laravel Sponsors
+```bash
+npm install
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+もし NPM がインストールできなかったら　 npm update で新しいバージョンをアップグレードしても大丈夫です。
 
-### Premium Partners
+<em><strong> Laravel のバージョンもアップグレードしたい時　なにも気にしなくて　これで　大丈夫です。</em></strong>
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+```bash
+composer update
+```
 
-## Contributing
+そして　.env.local をコピーして　こちらで　新しいキーをしてください。
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+<em><strong> サーバーからのデータをみたいなときに.env の APP_KEY をサーバーでの　キーと　合わせてください。</em></strong>
 
-## Code of Conduct
+```bash
+php artisan:key generate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+そして　 PostgresSQL で DB を作成します。　作成が終わったら　.env で　こういう感じでにしてください。
 
-## Security Vulnerabilities
+```bash
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=作成したDB名
+DB_USERNAME=DBのユーザー名
+DB_PASSWORD=DBのパスワード
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+こちらなどを　終わったら　ベースになるスキマを作成しましょう。
 
-## License
+CMD で実行してください。
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+こちらは base_client というスキマを作成してくれます。　ここでは　管理画面の情報などを保管されます。
+
+```bash
+php artisan tenant:create-base-schema --seed
+```
+
+管理画面の開発者のユーザー名とパスワードは ここにあります。　こちらは　変更しても大丈夫です。
+
+```bash
+database\seeders\AdminSeeder.php
+```
+
+そして base_client のスキマを作成しましょ。。
+
+```bash
+php artisan setup:base-client --seed
+```
+
+ここでは　クライアントのベースになる DB を作成されます。
+
+そして　ローカル　なら　ば　 2 つの CMD を開けます。
+
+そして　２つの CMD で　１つつ　実行します。
+
+```bash
+php artisan serve
+```
+
+```bash
+npm run dev
+```
+
+これら　実行されているときは　開発できます。
+
+## リリース準備
+
+リリースする時に　必ずこちらを　実行し　/public/build/を　全てアップしてください。
+
+```bash
+npm run build
+```
+
+## 開発する時　必ずこちらの手順をしてください。　しないと　エラー発生されます。
+
+こちらは　 database/migrations/tenant で　新しい migration ファイルを作成してくれます。
+
+```bash
+php artisan make:tenant-migration create_posts_table --create=posts
+```
+
+テーブルを更新してい時はこちらでお願いします。
+
+```bash
+php artisan make:tenant-migration add_status_to_posts_table --table=posts
+```
+
+base_tenent i.e 　管理テーブルにしたいときは　こちらをお願い致します。
+
+```bash
+php artisan make:migration create_example_table --path=database/migrations/base
+```
+
+<em><strong> そして　上の手順が終わったら　必ず　必ず　こちらを　実行してください。 </em></strong>
+
+```bash
+php artisan tenants:migrate
+```
+
+<em><strong> それを実行しないで　普通の Laravel みたいな　こちらを実行したら　エラー発生されます。</em></strong>
+
+```bash
+php artisan migrate
+```
+
+## Tenent 作成を開発する時の使い方
+
+Route をしたら　テネットのばいは　こちらが　必要です。
+
+理由はこの tenent がないと テネット個人の Middleware が動かなくなります。
+
+JS で URL をしても　同じです。　 JS のパラメーターは自分で送ってください。
+
+```bash
+{{ route('tenant.users.check_login', ['tenant' => $tenant_name] // <- ['tenant'])が必要 }}
+```
+
+## AXIOS の使い方
+
+非同期
+
+```bash
+const response = await axios.post('/api/backend/admin/tenent_users', data);
+console.log(response);
+```
+
+同期
+
+```bash
+axios.post('/api/persons/unique/alias', {
+        params: {
+            id: this.id,
+            alias: this.alias,
+        }
+    })
+    .then((response) => {
+        console.log('2. server response:' + response.data.unique)
+        this.valid = response.data.unique;
+    });
+```
+
+そして Laravel の PUT と DELETE を使う時に必ず \_method でしてください。
+
+Laravel のセキュリティーです。
+
+```bash
+ var data = {  _method: 'DELETE' };
+ const response = await axios.post('/api/backend/admin/tenent_users', data);
+ var data = {  _method: 'PUT' };
+ const response = await axios.post('/api/backend/admin/tenent_users', data);
+
+```
+
+## SweetAlert2 の使い方
+
+```bash
+Swal.fire({
+                    icon: 'question',
+                    title: langs.ask_create.replace(':data', '各サイトのメンテナンス'),
+                    html: data.modal_html,
+                    focusConfirm: false,
+                    showCancelButton: true,
+                    confirmButtonText: langs.yes,
+                    cancelButtonText: langs.no,
+                    customClass: {
+                        input: 'my-swal-input',
+                        confirmButton: 'btn btn-primary custom-confirm-button',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    preConfirm: () => {
+                        // This callback will return false initially, preventing the modal from closing
+                        return false;
+                    },
+
+                    didOpen: () => {
+                        var frontSiteChecked = jsonData?.front_site === 'frontend' ? true : false;
+                        var backSiteChecked = jsonData?.back_site === 'backend' ? true : false;
+                        var maintenanceMode = jsonData?.maintenance_0;
+                        var maintenanceTermStart = jsonData?.maintenance_term?.maintanance_term_start || '';
+                        var maintenanceTermEnd = jsonData?.maintenance_term?.maintanance_term_end || '';
+                        var allowIp = jsonData?.allow_ip?.join('\n'); // Join IPs with newline separator
+                        var frontMessage = jsonData?.front_main_message || '';
+                        var backMessage = jsonData?.back_main_message || '';
+                        console.log([frontSiteChecked,
+                            backSiteChecked,
+                            maintenanceMode,
+                            maintenanceTermStart,
+                            maintenanceTermEnd,
+                            allowIp,
+                            frontMessage,
+                            backMessage
+                        ]);
+                        // Collect form data from the modal
+                        // Set checkbox values based on boolean
+                        $('input[name="front_site_modal"]').prop('checked', frontSiteChecked);
+                        $('input[name="back_site_modal"]').prop('checked', backSiteChecked);
+                        $('input[name="maintenance_0_modal"][value="' + maintenanceMode + '"]').prop('checked', true);
+                        // Set the textarea values
+                        $('textarea[name="allow_ip_modal"]').val(allowIp);
+                        $('textarea[name="front_main_message_modal"]').val(frontMessage);
+                        $('textarea[name="back_main_message_modal"]').val(backMessage);
+
+                        // If you want to populate a label or another element:
+                        $('#maintenance_term_modal').text(maintenanceTermStart + ' to ' + maintenanceTermEnd);
+                        flatpickr("#maintenance_term_modal", {
+                            mode: 'range',
+                            enableTime: true,
+                            dateFormat: "Y-m-d H:i:S",
+                            time_24hr: true,
+                            defaultDate: [
+                                $('#maintenance_term_modal').data('start'),
+                                $('#maintenance_term_modal').data('end')
+                            ]
+                        });
+                        const confirmButton = Swal.getConfirmButton();
+                        if (confirmButton) {
+                            confirmButton.addEventListener('click', async () => {
+                                // Collect form data from the modal
+                                var frontSiteChecked = $('input[name="front_site_modal"]:checked').val();
+                                var backSiteChecked = $('input[name="back_site_modal"]:checked').val();
+                                var maintenanceMode = $('input[name="maintenance_0_modal"]:checked').val();
+                                var maintenanceTerm = $('input[name="maintenance_term_modal"]').val();
+                                var allowIp = $('textarea[name="allow_ip_modal"]').val();
+                                var frontMessage = $('textarea[name="front_main_message_modal"]').val();
+                                var backMessage = $('textarea[name="back_main_message_modal"]').val();
+
+                                // Create FormData object
+                                var formData = new FormData();
+                                // Add other form fields
+                                formData.append('front_site', frontSiteChecked);
+                                formData.append('back_site', backSiteChecked);
+                                formData.append('maintenance_0', maintenanceMode);
+
+                                formData.append('maintenance_term', maintenanceTerm);
+                                formData.append(`allow_ip`, allowIp);
+
+                                formData.append('front_main_message', frontMessage);
+                                formData.append('back_main_message', backMessage);
+                                formData.append('tenant', user_id);
+                                formData.append('_method', 'PUT');
+
+                                try {
+                                    const response = await axios.post(`/api/backend/admin/maitenances/${user_id}/update`, formData);
+
+                                    if (response.data.type === 'error') {
+                                        var errorMessages = response.data.data;
+                                        var errorMessage = errorMessages.join('<br>');
+
+                                        Swal.showValidationMessage(errorMessage.trim());
+                                        return; // Keep the modal open if validation fails
+                                    } else {
+                                        Swal.close();
+                                        Swal.fire({
+                                            icon: 'success',
+                                            title: langs.success_title,
+                                            text: langs.success.replace(':attribute', langs.account),
+                                            confirmButtonText: 'OK'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                // Reload the page after the user clicks "OK"
+                                                window.location.reload();
+                                            }
+                                        });
+                                    }
+                                } catch (error) {
+                                    console.error(error);
+                                    Swal.fire('Error!', 'There was an issue with your request.', 'error');
+                                    return; // Keep the modal open in case of request failure
+                                }
+                                // AJAX form submission
+
+                            });
+                        }
+                    }
+                });
+```
+
+以上
