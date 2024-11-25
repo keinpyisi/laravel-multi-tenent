@@ -42,8 +42,7 @@
             <div class="relative">
                 <input type="text" name="maintenance_term_modal" id="maintenance_term_modal"
                     class="datepicker form-input pl-9 dark:bg-gray-800 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100 font-medium w-[15.5rem] flatpickr-input"
-                    placeholder="Select date range" data-start="2024-11-01 16:00:00" data-end="2024-11-25 15:49:00"
-                    readonly="readonly">
+                    placeholder="Select date range" data-start="2024-11-01 16:00:00" data-end="2024-11-25 15:49:00">
                 <div class="absolute inset-0 right-auto flex items-center pointer-events-none">
                     <svg class="fill-current text-gray-400 dark:text-gray-500 ml-3" width="16" height="16"
                         viewBox="0 0 16 16">
