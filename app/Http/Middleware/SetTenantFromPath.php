@@ -22,7 +22,7 @@ class SetTenantFromPath {
         if ($config) {
             return response()->view('admin.layouts.maintainence', compact('config'), 503);
         }
-        $tenent_check = $this->isInTenentMaintenanceMode($request);
+        $config = $this->isInTenentMaintenanceMode($request);
         if ($config) {
             return response()->view('admin.layouts.maintainence', compact('config'), 503);
         }
@@ -210,18 +210,19 @@ class SetTenantFromPath {
         }
         // Check if maintenance mode is on
         if ($config['maintenance_0'] === 'on' || ($config['maintenance_0'] === 'scheduled' && $this->isInMaintenancePeriod($config['maintenance_term']))) {
-
-            $path = $request->path();
-            $segments = explode('/', $path);
-            $url = $segments[0];
             // Check if the current site is targeted for maintenance
             $userIp = $request->ip();
             if (!in_array($userIp, $config['allow_ip'])) {
-                $config['text'] = $this->formatMaintenanceMessage($config['back_main_message'], $config['maintenance_term']);
+                $path = $request->path();
+                $segments = explode('/', $path);
+                if ($segments[0] == 'backend') {
+                    $config['text'] = $this->formatMaintenanceMessage($config['back_main_message'], $config['maintenance_term']);
+                } else {
+                    $config['text'] = $this->formatMaintenanceMessage($config['front_main_message'], $config['maintenance_term']);
+                }
                 return $config;
             }
         }
-
         return false;
     }
 
