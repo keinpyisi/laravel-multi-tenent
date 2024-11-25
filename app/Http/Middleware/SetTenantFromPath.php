@@ -22,6 +22,10 @@ class SetTenantFromPath {
         if ($config) {
             return response()->view('admin.layouts.maintainence', compact('config'), 503);
         }
+        $tenent_check = $this->isInTenentMaintenanceMode($request);
+        if ($config) {
+            return response()->view('admin.layouts.maintainence', compact('config'), 503);
+        }
         $path = $request->path();
         $segments = explode('/', $path);
 
@@ -172,6 +176,49 @@ class SetTenantFromPath {
                     $config['text'] = $this->formatMaintenanceMessage($config['front_main_message'], $config['maintenance_term']);
                     return $config;
                 }
+            }
+        }
+
+        return false;
+    }
+
+    private function isInTenentMaintenanceMode(Request $request) {
+        $path = $request->path();
+        $segments = explode('/', $path);
+        // Tenant routes
+        $tenantSlug = $segments[1];
+        $settingPath = $tenantSlug . '/files/_settings/';
+        $jsonFileName = 'maintenance.json';
+        $fullJsonPath = $settingPath . $jsonFileName;
+
+        // Check if the maintenance.json file exists and read its contents
+        if (!Storage::disk('tenant')->exists($fullJsonPath)) {
+            return false;
+        }
+
+        try {
+            $existingJsonContent = Storage::disk('tenant')->get($fullJsonPath);
+            $config = json_decode($existingJsonContent, true);
+
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                Log::error('Error decoding existing JSON: ' . json_last_error_msg());
+                return false;
+            }
+        } catch (\Exception $e) {
+            Log::error('Error reading existing maintenance settings: ' . $e->getMessage());
+            return false;
+        }
+        // Check if maintenance mode is on
+        if ($config['maintenance_0'] === 'on' || ($config['maintenance_0'] === 'scheduled' && $this->isInMaintenancePeriod($config['maintenance_term']))) {
+
+            $path = $request->path();
+            $segments = explode('/', $path);
+            $url = $segments[0];
+            // Check if the current site is targeted for maintenance
+            $userIp = $request->ip();
+            if (!in_array($userIp, $config['allow_ip'])) {
+                $config['text'] = $this->formatMaintenanceMessage($config['back_main_message'], $config['maintenance_term']);
+                return $config;
             }
         }
 
