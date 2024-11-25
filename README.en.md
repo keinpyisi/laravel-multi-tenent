@@ -1,4 +1,4 @@
-Here's the translation of the provided text:
+Here is the translation of your text into English:
 
 ---
 
@@ -9,20 +9,19 @@ Here's the translation of the provided text:
 
 This is a Laravel environment that can manage multiple clients, similar to CodeIgniter's BaseClient.
 
-The admin panel is written with Tailwind CSS. Models and other elements use SweetAlert2, but you can <em><strong>create your own individual tenant "clients"</strong></em> if necessary.
+The admin panel is written using Tailwind CSS. Models and other components use SweetAlert2, but feel free to create individual tenants such as "clients" on your own.
 
-In this project, we use Axios instead of Ajax because Ajax is weak in terms of security.
+Here, we use Axios instead of Ajax because Ajax has weaker security.
 
 Reference: [OWASP](https://cheatsheetseries.owasp.org/cheatsheets/AJAX_Security_Cheat_Sheet.html)
 
 ## Setup
 
-Please [install Composer](https://getcomposer.org/download/).
-Any version will work fine.
+Please [install Composer](https://getcomposer.org/download/). Any version is fine.
 
-Install NodeJS v23 [here](https://nodejs.org/en/download/package-manager). The reason for this is that it automatically minifies and encrypts JS when writing.
+Please [install NodeJS v23](https://nodejs.org/en/download/package-manager). The reason is that it automatically minifies and encrypts JS files when writing.
 
-Then, open CMD here and run:
+Next, open CMD here and run:
 
 ```bash
 composer install
@@ -32,130 +31,167 @@ composer install
 npm install
 ```
 
-If you can't install NPM, it's fine to upgrade to the latest version using `npm update`.
+If npm fails to install, you can update to a newer version with `npm update`.
 
-<em><strong>If you want to upgrade Laravel as well, you don't need to worry about it, just run this:</strong></em>
+<em><strong>If you also want to upgrade Laravel, don’t worry, just run this:</strong></em>
 
 ```bash
 composer update
 ```
 
-Next, copy the `.env.local` file and set a new key.
+Then copy `.env.local` and create a new key here:
 
-<em><strong>When you want to view data from the server, make sure the APP_KEY in .env matches the key on the server.</strong></em>
+<em><strong>Make sure the APP_KEY in `.env` matches the server's key if you want to view data from the server.</strong></em>
 
 ```bash
 php artisan key:generate
 ```
 
-Now, create a database in PostgreSQL. Once done, set it like this in `.env`:
+Next, create the database in PostgreSQL. Once created, set the following in `.env`:
 
 ```bash
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
 DB_PORT=5432
-DB_DATABASE=YourCreatedDBName
-DB_USERNAME=YourDBUsername
-DB_PASSWORD=YourDBPassword
+DB_DATABASE=your_created_db_name
+DB_USERNAME=db_username
+DB_PASSWORD=db_password
 ```
 
-After this, let's create the base schema.
+Once done, create the base schema.
 
-Run this in CMD.
+Run the following in CMD:
 
-This will create the `base_client` schema, where admin panel information is stored.
+This will create a base_client schema where admin panel data is stored.
 
 ```bash
 php artisan tenant:create-base-schema --seed
 ```
 
-You can find the developer's username and password for the admin panel here. Feel free to change it.
+You can find the admin panel username and password here. Feel free to change them.
 
 ```bash
-database/seeders/AdminSeeder.php
+database\seeders\AdminSeeder.php
 ```
 
-Now, let's create the `base_client` schema.
+Now, let's create the base client schema:
 
 ```bash
 php artisan setup:base-client --seed
 ```
 
-This will create the base DB for clients.
+This will create the client’s base database.
 
-If you're working locally, open two CMD windows.
-
-Then, run the following in one of them:
+For local development, open two CMD windows and run these commands:
 
 ```bash
 php artisan serve
 ```
 
-In the other:
-
 ```bash
 npm run dev
 ```
 
-While these are running, you can develop.
+These will keep running while you develop.
 
-## Release Preparation
+## Preparing for Release
 
-Before releasing, always run this and upload everything from `/public/build/`:
+When releasing, always run this and upload everything in `/public/build/`:
 
 ```bash
 npm run build
 ```
 
-## Development Process (Make Sure to Follow These Steps or Errors May Occur)
+## Development Instructions
 
-Here’s how to create a new migration file under `database/migrations/tenant`:
+Follow these steps during development to avoid errors.
+
+This will create a new migration file in `database/migrations/tenant`:
 
 ```bash
 php artisan make:tenant-migration create_posts_table --create=posts
 ```
 
-When updating a table, use this:
+To update a table, use:
 
 ```bash
 php artisan make:tenant-migration add_status_to_posts_table --table=posts
 ```
 
-To make it a base tenant (admin table), use this:
+For the base tenant (admin table), use:
 
 ```bash
 php artisan make:migration create_example_table --path=database/migrations/base
 ```
 
-<em><strong>Once you finish the steps above, make sure to run this:</strong></em>
+<em><strong>Once the above steps are complete, make sure to run this:</strong></em>
 
 ```bash
 php artisan tenants:migrate
 ```
 
-<em><strong>If you run the usual Laravel migration command without this, it will cause errors.</strong></em>
+<em><strong>If you run the usual Laravel migration without this, errors will occur.</strong></em>
 
 ```bash
 php artisan migrate
 ```
 
-## Using Tenants During Development
+When creating routes, be sure to use Middleware.
 
-When routing, you need to specify the tenant:
+Reference: `routes/admin/admin.php`
 
-The reason is that without this tenant, the tenant-specific middleware won't work.
-
-Even when using JS, you need to send the parameters yourself.
+This is the admin middleware. Anything written here will be accessible routes.
 
 ```bash
-{{ route('tenant.users.check_login', ['tenant' => $tenant_name]) }}
+Route::prefix('backend/admin')->name('admin.')->middleware('set.tenant')
+```
+
+These routes require authentication:
+
+```bash
+Route::middleware(['admin.auth'])
+```
+
+Reference: `routes/tenants/tenant.php`
+
+This is the client tenant middleware, which is also necessary:
+
+```bash
+Route::prefix('backend/{tenant}')
+    ->middleware('set.tenant')  // Middleware to load tenant
+```
+
+These routes require client authentication:
+
+```bash
+ Route::middleware(['tenant.auth'])
+```
+
+## Basic Authentication
+
+Basic authentication is stored in `/storage/tenants/.htpasswd`. It's fine, as Laravel's storage is not publicly accessible. You can use the following symlink command safely.
+
+Once you create a client, Basic Authentication will be issued, and you can reset it via the admin panel.
+
+```bash
+php artisan storage:link
+```
+
+The symlink will link `/storage/app` to `/public`, so it’s safe.
+
+## Creating Tenants during Development
+
+When creating tenants, this step is necessary because without it, the tenant-specific middleware won’t work.
+
+For JS URLs, send the tenant parameter yourself.
+
+```bash
+{{ route('tenant.users.check_login', ['tenant' => $tenant_name]) }} // <- ['tenant'] is required
 ```
 
 ## Installing JS
 
-Install it via NPM or CDN. Without NPM, you can’t use JS.
-
-The reason is that Vite minifies and encrypts JS for you.
+You can install via NPM or CDN. You must use NPM to use JS, as Vite will minify and encrypt it.
 
 Example:
 
@@ -163,12 +199,12 @@ Example:
 npm install sweetalert2
 ```
 
-## Using AXIOS
+## Using Axios
 
 Asynchronous:
 
 ```bash
-const response = await axios.post('/api/backend/admin/tenent_users', data);
+const response = await axios.post('/api/backend/admin/tenant_users', data);
 console.log(response);
 ```
 
@@ -187,15 +223,13 @@ axios.post('/api/persons/unique/alias', {
     });
 ```
 
-When using Laravel’s PUT and DELETE, make sure to add `_method`:
-
-This is for Laravel security.
+When using PUT and DELETE in Laravel, always include `_method` for security.
 
 ```bash
 var data = { _method: 'DELETE' };
-const response = await axios.post('/api/backend/admin/tenent_users', data);
+const response = await axios.post('/api/backend/admin/tenant_users', data);
 var data = { _method: 'PUT' };
-const response = await axios.post('/api/backend/admin/tenent_users', data);
+const response = await axios.post('/api/backend/admin/tenant_users', data);
 ```
 
 ## Using SweetAlert2
@@ -203,7 +237,7 @@ const response = await axios.post('/api/backend/admin/tenent_users', data);
 ```bash
 Swal.fire({
     icon: 'question',
-    title: langs.ask_create.replace(':data', 'Maintenance for each site'),
+    title: langs.ask_create.replace(':data', 'site maintenance'),
     html: data.modal_html,
     focusConfirm: false,
     showCancelButton: true,
@@ -217,7 +251,8 @@ Swal.fire({
     allowOutsideClick: false,
     allowEscapeKey: false,
     preConfirm: () => {
-        return false; // Prevent modal from closing initially
+        // This callback will return false initially, preventing the modal from closing
+        return false;
     },
     didOpen: () => {
         var frontSiteChecked = jsonData?.front_site === 'frontend' ? true : false;
@@ -228,8 +263,9 @@ Swal.fire({
         var allowIp = jsonData?.allow_ip?.join('\n'); // Join IPs with newline separator
         var frontMessage = jsonData?.front_main_message || '';
         var backMessage = jsonData?.back_main_message || '';
+        console.log([frontSiteChecked, backSiteChecked, maintenanceMode, maintenanceTermStart, maintenanceTermEnd, allowIp, frontMessage, backMessage]);
 
-        // Update modal values
+        // Set the values for the modal inputs and textareas
         $('input[name="front_site_modal"]').prop('checked', frontSiteChecked);
         $('input[name="back_site_modal"]').prop('checked', backSiteChecked);
         $('input[name="maintenance_0_modal"][value="' + maintenanceMode + '"]').prop('checked', true);
@@ -243,12 +279,16 @@ Swal.fire({
             enableTime: true,
             dateFormat: "Y-m-d H:i:S",
             time_24hr: true,
-            defaultDate: [$('#maintenance_term_modal').data('start'), $('#maintenance_term_modal').data('end')]
+            defaultDate: [
+                $('#maintenance_term_modal').data('start'),
+                $('#maintenance_term_modal').data('end')
+            ]
         });
 
         const confirmButton = Swal.getConfirmButton();
         if (confirmButton) {
             confirmButton.addEventListener('click', async () => {
+                // Collect form data from the modal
                 var frontSiteChecked = $('input[name="front_site_modal"]:checked').val();
                 var backSiteChecked = $('input[name="back_site_modal"]:checked').val();
                 var maintenanceMode = $('input[name="maintenance_0_modal"]:checked').val();
@@ -257,48 +297,34 @@ Swal.fire({
                 var frontMessage = $('textarea[name="front_main_message_modal"]').val();
                 var backMessage = $('textarea[name="back_main_message_modal"]').val();
 
-                // Prepare form data
+                // Create FormData object
                 var formData = new FormData();
                 formData.append('front_site', frontSiteChecked);
                 formData.append('back_site', backSiteChecked);
                 formData.append('maintenance_0', maintenanceMode);
                 formData.append('maintenance_term', maintenanceTerm);
-                formData.append('allow_ip', allowIp);
+                formData.append(`allow_ip`, allowIp);
                 formData.append('front_main_message', frontMessage);
                 formData.append('back_main_message', backMessage);
-                formData.append('tenant', user_id);
-                formData.append('_method', 'PUT');
+                formData.append('tenant', user
 
-                try {
-                    const response = await axios.post(`/api/backend/admin/maitenances/${user_id}/update`, formData);
+Tenant);
 
-                    if (response.data.type === 'error') {
-                        var errorMessages = response.data.data;
-                        var errorMessage = errorMessages.join('<br>');
-                        Swal.showValidationMessage(errorMessage.trim());
-                        return;
-                    } else {
-                        Swal.close();
-                        Swal.fire({
-                            icon: 'success',
-                            title: langs.success_title,
-                            text: langs.success.replace(':attribute', langs.account),
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                window.location.reload();
-                            }
-                        });
-                    }
-                } catch (error) {
-                    console.error(error);
-                    Swal.fire('Error!', 'There was an issue with your request.', 'error');
-                    return;
-                }
+                // Send data to backend for processing
+                await axios.post('/backend/api/maintenance', formData)
+                    .then(response => {
+                        if (response.status === 200) {
+                            Swal.fire('Saved Successfully!');
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        Swal.fire('Error saving data!');
+                    });
             });
         }
     }
-});
+})
 ```
 
-That’s all!
+Let me know if you need any further clarification!

@@ -1,5 +1,5 @@
-- [English](README.en.md)
-- [日本語](README.md)
+-   [English](README.en.md)
+-   [日本語](README.md)
 
 # Laravel で複数のクライアント作成
 
@@ -132,6 +132,51 @@ php artisan tenants:migrate
 ```bash
 php artisan migrate
 ```
+
+そして Route を作成するとき必ず Middleware を設置してください。
+
+参考： routes/admin/admin.php
+
+こちらは　管理者の Middleware です。ここの中に書いているものは公開ルートです。
+
+```bash
+Route::prefix('backend/admin')->name('admin.')->middleware('set.tenant')
+```
+
+ここの中に書くものは　認証が必要なルートです。
+
+```bash
+Route::middleware(['admin.auth'])
+```
+
+参考：　 routes/tenents/tenant.php
+
+ここは　クライアント　テネットの Middleware です。必ずこちらも必要です。
+
+```bash
+Route::prefix('backend/{tenant}')
+    ->middleware('set.tenant')  // Middleware to load tenant
+```
+
+これはクライアントで認証が必要なルートです。
+
+```bash
+ Route::middleware(['tenent.auth'])
+```
+
+## Basic 認証
+
+Basic 認証は基本 /storage/tenants/.htpasswd で登録されます。
+大丈夫です。基本 Laravel の storage は　公開できないように　なってます。
+Symlink のこちらの　 cmd を使用しても　大丈夫です。
+基本クライアントを作成したら Basic 認証が発行されますので。。
+管理画面そのクライアントの Basic 認証はリセットできます。
+
+```bash
+php artisan storage:link
+```
+
+上の Symlink は基本 /storage/app を /public にしてくれる　物なので　大丈夫です。
 
 ## Tenent 作成を開発する時の使い方
 
