@@ -33,8 +33,8 @@
                         'off' => 'OFF'
                         ],];
 
-                        $selectedOptions = isset($json_data['maintenance']) ? [$json_data['maintenance']] :
-                        ['scheduled'];
+                        $selectedOptions = isset($json_data['maintenance_0']) ? [$json_data['maintenance_0']] :
+                        ['off'];
                         @endphp
 
                         <x-admin::radio_btn name="maintenance" title="maintenance mode" :options="$maintenanceOptions"

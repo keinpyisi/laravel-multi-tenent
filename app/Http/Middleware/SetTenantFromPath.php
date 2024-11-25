@@ -150,7 +150,7 @@ class SetTenantFromPath {
             return false;
         }
         // Check if maintenance mode is on
-        if ($config['maintenance_0'] === 'ON' || ($config['maintenance_0'] === 'scheduled' && $this->isInMaintenancePeriod($config['maintenance_term']))) {
+        if ($config['maintenance_0'] === 'on' || ($config['maintenance_0'] === 'scheduled' && $this->isInMaintenancePeriod($config['maintenance_term']))) {
 
             $path = $request->path();
             $segments = explode('/', $path);
