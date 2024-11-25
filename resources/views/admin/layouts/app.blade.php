@@ -14,11 +14,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap" rel="stylesheet" />
     <script>
-        window.Laravel = {
-            success: @json(session('success')),
-            error: @json(session('error'))
-        };
-        window.Lang = @json(__('lang')); // Assuming 'lang' is your language file
+    window.Laravel = {
+        success: @json(session('success')),
+        error: @json(session('error'))
+    };
+    window.Lang = @json(__('lang')); // Assuming 'lang' is your language file
     </script>
     <!-- Scripts -->
     @vite(['resources/js/app.js', 'resources/css/app.css'])
@@ -29,17 +29,29 @@
     @if (isset($header_css_defines) && !empty($header_css_defines))
     @vite($header_css_defines)
     @endif
+    @if (isset($header_js_variables) && !empty($header_js_variables))
+    <script>
+    (function() {
+        var jsVars = @json($header_js_variables);
+        for (var key in jsVars) {
+            if (jsVars.hasOwnProperty(key)) {
+                window[key] = jsVars[key];
+            }
+        }
+    })();
+    </script>
+    @endif
     <!-- Styles -->
     @livewireStyles
 
     <script>
-        if (localStorage.getItem('dark-mode') === 'false' || !('dark-mode' in localStorage)) {
-            document.querySelector('html').classList.remove('dark');
-            document.querySelector('html').style.colorScheme = 'light';
-        } else {
-            document.querySelector('html').classList.add('dark');
-            document.querySelector('html').style.colorScheme = 'dark';
-        }
+    if (localStorage.getItem('dark-mode') === 'false' || !('dark-mode' in localStorage)) {
+        document.querySelector('html').classList.remove('dark');
+        document.querySelector('html').style.colorScheme = 'light';
+    } else {
+        document.querySelector('html').classList.add('dark');
+        document.querySelector('html').style.colorScheme = 'dark';
+    }
     </script>
 </head>
 
@@ -49,11 +61,11 @@
     x-init="$watch('sidebarExpanded', value => localStorage.setItem('sidebar-expanded', value))">
 
     <script>
-        if (localStorage.getItem('sidebar-expanded') == 'true') {
-            document.querySelector('body').classList.add('sidebar-expanded');
-        } else {
-            document.querySelector('body').classList.remove('sidebar-expanded');
-        }
+    if (localStorage.getItem('sidebar-expanded') == 'true') {
+        document.querySelector('body').classList.add('sidebar-expanded');
+    } else {
+        document.querySelector('body').classList.remove('sidebar-expanded');
+    }
     </script>
 
     <!-- Page wrapper -->

@@ -2,6 +2,7 @@
 
 namespace App\Models\Tenant;
 
+use Carbon\Carbon;
 use App\Models\Tenant\Tenant;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Notifications\Notifiable;
@@ -44,6 +45,9 @@ class User extends Authenticatable {
     // Mutator to hash password before saving
     public function setPasswordAttribute($value) {
         $this->attributes['password'] = Hash::make($value);
+    }
+    public function getUpdatedAtAttribute($value) {
+        return Carbon::parse($value)->format('Y-m-d H:i:s');
     }
 
     public function tenant(): HasOne {

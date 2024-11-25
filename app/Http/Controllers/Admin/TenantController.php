@@ -215,7 +215,14 @@ class TenantController extends Controller {
         view()->share('header_js_defines', $header_js_defines);
         view()->share('header_css_defines', $header_css_defines);
 
+
+
         $tenant = Tenant::findOrFail($id);
+        $header_js_variables = [
+            'tenant' => $tenant->database,
+        ];
+        view()->share('header_js_variables', $header_js_variables);
+
         DB::statement("SET search_path TO {$tenant->database}");
         $users = User::where('tenant_id', $tenant->id)->paginate(100);
         DB::statement("SET search_path TO base_tenants");

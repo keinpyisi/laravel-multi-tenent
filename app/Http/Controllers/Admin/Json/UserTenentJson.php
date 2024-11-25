@@ -8,11 +8,12 @@ use App\Models\Tenant\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Models\Base\User as BaseUser;
 use Illuminate\Support\Facades\Validator;
 
-class UserJson extends Controller {
+
+class UserTenentJson extends Controller {
     private Request $request;
 
     public function __construct(Request $request) {
@@ -21,9 +22,10 @@ class UserJson extends Controller {
 
     public function get_all(Request $request) {
         try {
-            DB::statement("SET search_path TO base_tenants");
-            $users = BaseUser::with(['updatedBy:id,user_name'])  // Use 'with' to load the 'updatedBy' relationship
-                ->select('id', 'login_id', 'user_name', 'update_user_id', 'updated_at');  // Adjust with actual columns you want to retrieve
+
+            DB::statement("SET search_path TO " . $request->tenant);
+            $users = User::with(['tenant:id,client_name'])  // Use 'with' to load the 'updatedBy' relationship
+                ->select('id', 'login_id', 'user_name', 'tenant_id', 'updated_at');  // Adjust with actual columns you want to retrieve
             // Check if 'data' is provided in the request and search both login_id and user_name
             if ($request->has('data')) {
                 $searchTerm = $request->input('data');
@@ -43,11 +45,11 @@ class UserJson extends Controller {
             DB::statement("SET search_path TO base_tenants");
         }
     }
-    public function get_one($user_id) {
+    public function get_one(Request $request, $user_id) {
         try {
-            DB::statement("SET search_path TO base_tenants");
-            $user = BaseUser::with(['updatedBy:id,user_name'])  // Use 'with' to load the 'updatedBy' relationship
-                ->select('id', 'login_id', 'user_name', 'update_user_id', 'updated_at')  // Adjust with actual columns you want to retrieve
+            DB::statement("SET search_path TO " . $request->tenant);
+            $user = User::with(['tenant:id,client_name'])   // Use 'with' to load the 'updatedBy' relationship
+                ->select('id', 'login_id', 'user_name', 'tenant_id', 'updated_at')  // Adjust with actual columns you want to retrieve
                 ->where('id', $user_id)
                 ->first();
             return json_send(JsonResponse::HTTP_OK, $user);
@@ -64,34 +66,13 @@ class UserJson extends Controller {
     public function store(Request $request) {
         try {
             $validator = Validator::make($request->all(), [
-                'login_id' => 'required|string|min:1|unique:users,login_id',  // Ensure the unique rule specifies the table and column
-                'password' => 'required|string|min:1',  // Adjust as needed
-                'user_name' => 'required|string|min:1',  // Adjust as needed
+                'tenant' => 'required',
             ]);
             if ($validator->fails()) {
                 $errorMessages = $validator->errors()->all();
                 return json_send(JsonResponse::HTTP_OK, $errorMessages, 'error');
             }
-            DB::statement("SET search_path TO base_tenants");
-            DB::beginTransaction();
-            $data = array_merge($validator->validated(), [
-                'name' => $request->user_name,
-            ]);
-            $user = User::create($data);
-            DB::commit();
-            return json_send(JsonResponse::HTTP_OK, $user);
-        } catch (Exception $ex) {
-            DB::rollBack();
-            log_message('Error occurred during user creation: ', ['exception' => $ex->getMessage()]);
-            return json_send(JsonResponse::HTTP_INTERNAL_SERVER_ERROR, ['error' => $ex->getMessage()]);
-        } finally {
-            // Always reset search path back to base_tenants in case of failure
-            DB::statement("SET search_path TO base_tenants");
-        }
-    }
-
-    public function update(Request $request, int $id) {
-        try {
+            DB::statement("SET search_path TO " . $request->tenant);
             $validator = Validator::make($request->all(), [
                 'login_id' => 'required|string|min:1|unique:users,login_id',  // Ensure the unique rule specifies the table and column
                 'password' => 'required|string|min:1',  // Adjust as needed
@@ -101,16 +82,44 @@ class UserJson extends Controller {
                 $errorMessages = $validator->errors()->all();
                 return json_send(JsonResponse::HTTP_OK, $errorMessages, 'error');
             }
-            DB::statement("SET search_path TO base_tenants");
             DB::beginTransaction();
-            $data = array_merge($validator->validated(), [
-                'name' => $request->user_name,
+            $user = User::create($validator->validated());
+            DB::commit();
+            return json_send(JsonResponse::HTTP_OK, $user);
+        } catch (Exception $ex) {
+            DB::rollBack();
+            log_message('Error occurred during user creation: ', ['exception' => $ex->getMessage()]);
+            return json_send(JsonResponse::HTTP_INTERNAL_SERVER_ERROR, ['error' => $ex->getMessage()]);
+        }
+    }
+
+    public function update(Request $request, int $id) {
+        try {
+            $validator = Validator::make($request->all(), [
+                'tenant' => 'required',
             ]);
+            if ($validator->fails()) {
+                $errorMessages = $validator->errors()->all();
+                return json_send(JsonResponse::HTTP_OK, $errorMessages, 'error');
+            }
+            DB::statement("SET search_path TO " . $request->tenant);
+
+            $validator = Validator::make($request->all(), [
+                'login_id' => 'required|string|min:1|unique:users,login_id',  // Ensure the unique rule specifies the table and column
+                'password' => 'required|string|min:1',  // Adjust as needed
+                'user_name' => 'required|string|min:1',  // Adjust as needed
+            ]);
+            if ($validator->fails()) {
+                $errorMessages = $validator->errors()->all();
+                return json_send(JsonResponse::HTTP_OK, $errorMessages, 'error');
+            }
+            DB::beginTransaction();
+
             // Find the user by ID or any identifier (e.g., $request->user_id)
             $user = User::find($id);
             // Check if the user exists before updating
             if ($user) {
-                $user->update($data);
+                $user->update($validator->validated());
             } else {
                 return json_send(JsonResponse::HTTP_NOT_FOUND, ['error' => 'User not found']);
             }
@@ -120,16 +129,20 @@ class UserJson extends Controller {
             log_message('Error occurred during tenant creation: ', ['exception' => $ex->getMessage()]);
             DB::rollBack();
             return json_send(JsonResponse::HTTP_INTERNAL_SERVER_ERROR, ['error' => $ex->getMessage()]);
-        } finally {
-            // Always reset search path back to base_tenants in case of failure
-            DB::statement("SET search_path TO base_tenants");
         }
     }
 
 
     public function destroy(Request $request) {
         try {
-            DB::statement("SET search_path TO base_tenants");
+            $validator = Validator::make($request->all(), [
+                'tenant' => 'required',
+            ]);
+            if ($validator->fails()) {
+                $errorMessages = $validator->errors()->all();
+                return json_send(JsonResponse::HTTP_OK, $errorMessages, 'error');
+            }
+            DB::statement("SET search_path TO " . $request->tenant);
             DB::beginTransaction();
             $user = User::destroy($request->ids);
             // Commit the transaction
@@ -141,9 +154,6 @@ class UserJson extends Controller {
             // Rollback transaction in case of error
             DB::rollBack();
             return json_send(JsonResponse::HTTP_INTERNAL_SERVER_ERROR, ['error' => $ex->getMessage()]);
-        } finally {
-            // Always reset search path back to base_tenants in case of failure
-            DB::statement("SET search_path TO base_tenants");
         }
     }
 }

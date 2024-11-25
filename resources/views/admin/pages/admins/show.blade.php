@@ -17,31 +17,33 @@
             </h2>
             <!-- Tab Navigation -->
             <div class="flex space-x-4 border-b border-gray-200 dark:border-gray-700">
-                <button
-                    :class="{
+                <button :class="{
                         'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600': activeTab ===
                             0,
                         'text-gray-500 dark:text-gray-400': activeTab !== 0
-                    }"
-                    @click="activeTab = 0" class="py-2 px-4 text-sm font-medium focus:outline-none">
+                    }" @click="activeTab = 0" class="py-2 px-4 text-sm font-medium focus:outline-none">
                     詳細
                 </button>
-                <button
-                    :class="{
+                <button :class="{
                         'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600': activeTab ===
                             1,
                         'text-gray-500 dark:text-gray-400': activeTab !== 1
-                    }"
-                    @click="activeTab = 1" class="py-2 px-4 text-sm font-medium focus:outline-none">
+                    }" @click="activeTab = 1" class="py-2 px-4 text-sm font-medium focus:outline-none">
                     使用状況
                 </button>
-                <button
-                    :class="{
+                <button :class="{
+                        'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600': activeTab ===
+                            3,
+                        'text-gray-500 dark:text-gray-400': activeTab !== 3
+                    }" @click="activeTab = 3"
+                    class="user_setting_btn py-2 px-4 text-sm font-medium focus:outline-none">
+                    ユーザー設定
+                </button>
+                <button :class="{
                         'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600': activeTab ===
                             2,
                         'text-gray-500 dark:text-gray-400': activeTab !== 2
-                    }"
-                    @click="activeTab = 2" class="py-2 px-4 text-sm font-medium focus:outline-none">
+                    }" @click="activeTab = 2" class="py-2 px-4 text-sm font-medium focus:outline-none">
                     認証情報
                 </button>
             </div>
@@ -68,7 +70,7 @@
                                         id="client_name" placeholder="例:アスコン商店" value="{{ $tenant->client_name }}"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
                                     @error('client_name')
-                                        <div class="text-sm text-red-600">{{ $message }}</div>
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="flex flex-col">
@@ -76,7 +78,7 @@
                                         placeholder="例:アスコン商店" value="{{ $tenant->kana }}"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
                                     @error('kana')
-                                        <div class="text-sm text-red-600">{{ $message }}</div>
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="flex flex-col">
@@ -84,21 +86,21 @@
                                         id="person_in_charge" placeholder="刹那恵" value="{{ $tenant->person_in_charge }}"
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
                                     @error('kana')
-                                        <div class="text-sm text-red-600">{{ $message }}</div>
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="flex flex-col">
                                     <x-admin::input-field type="file" label="ロゴ*" name="logo" id="logo"
                                         class="mt-1 block w-full" />
                                     @php
-                                        $logoPath = $tenant->logo; // e.g., 'tenants/ecos/logo/logo-dark.png'
-                                        $domain = explode('/', $logoPath)[0]; // ecos
-                                        $file = basename($logoPath); // logo-dark.png
+                                    $logoPath = $tenant->logo; // e.g., 'tenants/ecos/logo/logo-dark.png'
+                                    $domain = explode('/', $logoPath)[0]; // ecos
+                                    $file = basename($logoPath); // logo-dark.png
                                     @endphp
                                     <img src="{{ route('tenant.logo', ['domain' => $domain, 'file' => $file]) }}"
                                         alt='Logo' class='h-25 w-35 object-cover'>
                                     @error('logo')
-                                        <div class="text-sm text-red-600">{{ $message }}</div>
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="flex flex-col">
@@ -106,7 +108,7 @@
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                         value="{{ $tenant->support_mail }}" placeholder="例:support@ascon.co.jp" />
                                     @error('support_mail')
-                                        <div class="text-sm text-red-600">{{ $message }}</div>
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="flex flex-col">
@@ -114,7 +116,7 @@
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                         value="{{ $tenant->e_mail }}" placeholder="例:support@ascon.co.jp" />
                                     @error('e_mail')
-                                        <div class="text-sm text-red-600">{{ $message }}</div>
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="flex flex-col">
@@ -122,7 +124,7 @@
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                         value="{{ $tenant->tel }}" placeholder="01-123-3345" />
                                     @error('tel')
-                                        <div class="text-sm text-red-600">{{ $message }}</div>
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="flex flex-col">
@@ -130,7 +132,7 @@
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                         value="{{ $tenant->fax_number }}" placeholder="01-123-3345" />
                                     @error('tel')
-                                        <div class="text-sm text-red-600">{{ $message }}</div>
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="flex flex-col">
@@ -138,7 +140,7 @@
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                         value="{{ $tenant->url }}" placeholder="https://www.google.com/" />
                                     @error('url')
-                                        <div class="text-sm text-red-600">{{ $message }}</div>
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="flex flex-col">
@@ -146,7 +148,7 @@
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                         value="{{ $tenant->post_code }}" placeholder="134-0084" />
                                     @error('post_code')
-                                        <div class="text-sm text-red-600">{{ $message }}</div>
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="flex flex-col">
@@ -154,7 +156,7 @@
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                         rows=3 cols=35 value="{{ $tenant->address }}" />
                                     @error('address')
-                                        <div class="text-sm text-red-600">{{ $message }}</div>
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
                                     @enderror
                                 </div>
                                 <div class="flex flex-col">
@@ -162,7 +164,7 @@
                                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                         rows=3 cols=35 value="{{ $tenant->note }}" />
                                     @error('note')
-                                        <div class="text-sm text-red-600">{{ $message }}</div>
+                                    <div class="text-sm text-red-600">{{ $message }}</div>
                                     @enderror
                                 </div>
                             </div>
@@ -231,10 +233,11 @@
                                     <div class="flex justify-between items-center">
                                         <x-admin::labels label="パスワード"
                                             class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
-                                        @if (isset(session('success')['basic_pass']) && session('success')['basic_pass'])
-                                            <span class="font-semibold">{{ session('success')['basic_pass'] }}</span>
+                                        @if (isset(session('success')['basic_pass']) &&
+                                        session('success')['basic_pass'])
+                                        <span class="font-semibold">{{ session('success')['basic_pass'] }}</span>
                                         @else
-                                            <span class="font-semibold">********</span>
+                                        <span class="font-semibold">********</span>
                                         @endif
 
                                     </div>
@@ -256,6 +259,86 @@
                                     </x-admin::button>
                                 </div>
                             </form>
+                        </div>
+                    </div>
+
+                </div>
+                <div x-show="activeTab === 3">
+                    <!-- Content for Tab 2 -->
+                    <!-- Section for Overview -->
+                    <div class="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 mb-6">
+                        <div class="mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
+                            <div class="max-w-7xl mx-auto">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h2 class="text-title-md2 font-bold text-black dark:text-white">
+                                        アカウント設定
+                                        </h1>
+                                        <div class="space-x-2">
+                                            <x-admin::button :action="[
+                            'id' => 'addUserBtn',
+                            'label' => '新規',
+                            'type' => 'button',
+                            'class' =>
+                                'transition duration-150 ease-in-out px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500',
+                        ]">
+                                            </x-admin::button>
+                                            <x-admin::button :action="[
+                            'id' => 'delUserBtn',
+                            'label' => '削除',
+                            'type' => 'button',
+                            'class' =>
+                                'transition duration-150 ease-in-out px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500',
+                        ]">
+                                            </x-admin::button>
+                                        </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <x-admin::input type="text" name="user_search" id="user_search" placeholder="検索。。。"
+                                        value="{{ old('client_name') }}"
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                                </div>
+
+                                <div class="bg-gray-800 rounded-lg shadow overflow-hidden">
+                                    <table
+                                        class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400"
+                                        id="dataTable">
+                                        <thead
+                                            class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                                            <tr>
+                                                <th class="p-3 text-left">
+                                                    <input type="checkbox" id="selectAll"
+                                                        class="rounded border-gray-600 text-blue-600 focus:ring-blue-500">
+                                                </th>
+                                                <th
+                                                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white uppercase tracking-wider">
+                                                    ID</th>
+                                                <th
+                                                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white uppercase tracking-wider">
+                                                    LoginId
+                                                </th>
+                                                <th
+                                                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white uppercase tracking-wider">
+                                                    User
+                                                    Name</th>
+                                                <th
+                                                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white uppercase tracking-wider">
+                                                    Updated
+                                                    Date</th>
+                                                <th
+                                                    class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white uppercase tracking-wider">
+                                                    Edited
+                                                    User</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-700 tenent_user_table">
+                                            <!-- Add more rows as needed -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- Pagination Section -->
+                            <div class="mt-6 flex justify-center space-x-2" id="pagination-controls"></div>
                         </div>
                     </div>
 

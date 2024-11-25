@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\Json\UserJson;
+use App\Http\Controllers\Admin\Json\UserTenentJson;
 
 Route::prefix('backend/admin')->name('admin.')->middleware('set.api.tenant')->group(function () {
     Route::get('user', [UserJson::class, 'get_all'])->name('users.all');
@@ -9,4 +10,11 @@ Route::prefix('backend/admin')->name('admin.')->middleware('set.api.tenant')->gr
     Route::put('users/{id}/update', [UserJson::class, 'update'])->name('users.update');
     Route::delete('users', [UserJson::class, 'destroy'])->name('users.destroy');
     Route::get('users/{id}', [UserJson::class, 'get_one'])->name('users.show');
+
+
+    Route::get('tenent_user', [UserTenentJson::class, 'get_all'])->name('tenent_user.all');
+    Route::post('tenent_users', [UserTenentJson::class, 'store'])->name('tenent_user.store');
+    Route::put('tenent_users/{id}/update', [UserTenentJson::class, 'update'])->name('tenent_user.update');
+    Route::delete('tenent_users', [UserTenentJson::class, 'destroy'])->name('tenent_user.destroy');
+    Route::get('tenent_users/{id}', [UserTenentJson::class, 'get_one'])->name('tenent_user.show');
 });
