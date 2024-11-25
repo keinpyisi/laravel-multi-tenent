@@ -51,6 +51,11 @@ if (!function_exists('log_message')) {
      * @param array $context Additional log context
      */
     function log_message($message, $data = [],  $channel = 'tenant', array $context = []) {
+        if (is_array($message)) {
+            $data = $message['data'] ?? [];
+            $context = $message['context'] ?? [];
+            $message = $message['message'] ?? 'No message provided';
+        }
         // Get the backtrace to capture file, line, and function information
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2)[1];
 

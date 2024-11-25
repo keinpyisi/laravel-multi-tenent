@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Exception;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 class AuthController extends Controller {
     protected $redirectTo = 'backend/admin/login';
     public function showLoginForm() {
+        Auth::logout();
         return view('admin.auth.login');
     }
 
