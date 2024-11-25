@@ -87,8 +87,8 @@
                         </div>
                     </li>
                     <!-- Settings -->
-                    <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-[linear-gradient(135deg,var(--tw-gradient-stops))] @if (in_array(Request::segment(1), ['settings'])) {{ 'from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]' }} @endif"
-                        x-data="{ open: {{ in_array(Request::segment(3), ['users']) ? 1 : 0 }} }">
+                    <li class="pl-4 pr-3 py-2 rounded-lg mb-0.5 last:mb-0 bg-[linear-gradient(135deg,var(--tw-gradient-stops))] @if (in_array(Request::segment(3), ['users', 'maitenance'])) {{ 'from-violet-500/[0.12] dark:from-violet-500/[0.24] to-violet-500/[0.04]' }} @endif"
+                        x-data="{ open: {{ in_array(Request::segment(3), ['users', 'maitenance']) ? 1 : 0 }} }">
                         <a class="block text-gray-800 dark:text-gray-100 truncate transition @if (!in_array(Request::segment(3), ['users'])) {{ 'hover:text-gray-900 dark:hover:text-white' }} @endif"
                             href="#0" @click.prevent="open = !open; sidebarExpanded = true">
                             <div class="flex items-center justify-between">
@@ -114,8 +114,10 @@
                             </div>
                         </a>
                         <div class="lg:hidden lg:sidebar-expanded:block 2xl:block">
-                            <ul class="pl-8 mt-1 @if (!in_array(Request::segment(3), ['users'])) {{ 'hidden' }} @endif"
-                                :class="open ? '!block' : 'hidden'">
+                            <ul class="pl-8 mt-1
+                            @if (in_array(Request::segment(3), ['users', 'maitenance'])) hover:text-gray-900 dark:hover:text-white @endif"
+                                :class="in_array('{{ Request::segment(3) }}', ['users', 'maitenance']) ? '!block' : 'hidden'">
+
                                 <li class="mb-1 last:mb-0">
                                     <a class="block text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition truncate @if (Route::is('admin.users.index')) {{ '!text-violet-500' }} @endif"
                                         href="{{ route('admin.users.index') }}">
@@ -125,8 +127,8 @@
                                     </a>
                                 </li>
                                 <li class="mb-1 last:mb-0">
-                                    <a class="block text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition truncate @if (Route::is('notifications')) {{ '!text-violet-500' }} @endif"
-                                        href="">
+                                    <a class="block text-gray-500/90 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition truncate @if (Route::is('admin.maitenance.index')) {{ '!text-violet-500' }} @endif"
+                                        href="{{ route('admin.maitenance.index') }}">
                                         <span
                                             class="text-sm font-medium lg:opacity-0 lg:sidebar-expanded:opacity-100 2xl:opacity-100 duration-200">
                                             メインテナンス設定</span>
