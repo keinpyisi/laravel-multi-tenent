@@ -21,6 +21,7 @@ $(function () {
         axios.get('/api/backend/admin/maitenances/' + user_id)
             .then(response => {
                 var data = response.data.data;
+                var jsonData = response.data.data.data;
                 Swal.fire({
                     icon: 'question',
                     title: langs.ask_create.replace(':data', '各サイトのメンテナンス'),
@@ -42,9 +43,28 @@ $(function () {
                     },
 
                     didOpen: () => {
-                        $('textarea[name="allow_ip_modal"]').val('127.0.0.1');
-                        $('textarea[name="front_main_message_modal"]').val('Front');
-                        $('textarea[name="back_main_message_modal"]').val('Back');
+                        var frontSiteChecked = jsonData.front_site === 'frontend' ? true : false;
+                        var backSiteChecked = jsonData.back_site === 'backend' ? true : false;
+                        var maintenanceMode = jsonData.maintenance_0;
+                        var maintenanceTermStart = jsonData.maintenance_term.maintanance_term_start || '';
+                        var maintenanceTermEnd = jsonData.maintenance_term.maintanance_term_end || '';
+                        var allowIp = jsonData.allow_ip.join(PHP_EOL); // Join IPs with newline separator
+                        var frontMessage = jsonData.front_main_message || '';
+                        var backMessage = jsonData.back_main_message || '';
+
+                        // Collect form data from the modal
+                        // Set checkbox values based on boolean
+                        $('input[name="front_site"]').prop('checked', frontSiteChecked);
+                        $('input[name="back_site"]').prop('checked', backSiteChecked);
+                        $('input[name="maintenance_mode"]').prop('checked', maintenanceMode === 'true');
+
+                        // Set the textarea values
+                        $('textarea[name="allow_ip"]').val(allowIp);
+                        $('textarea[name="front_message"]').val(frontMessage);
+                        $('textarea[name="back_message"]').val(backMessage);
+
+                        // If you want to populate a label or another element:
+                        $('#maintenance_term').text(maintenanceTermStart + ' to ' + maintenanceTermEnd);
                         flatpickr("#maintenance_term_modal", {
                             mode: 'range',
                             enableTime: true,
